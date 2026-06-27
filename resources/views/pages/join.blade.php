@@ -1,22 +1,22 @@
 @extends('layouts.site')
 
-@section('title', 'Adhérer | La Quinzaine Obstétricale')
+@section('title', 'Nous soutenir | La Quinzaine Obstetricale')
 
 @section('content')
 <section class="page-hero join-hero">
-    <p class="eyebrow">Adhésion</p>
-    <h1>Rejoindre La Quinzaine Obstétricale</h1>
-    <p>Adhérer, c’est soutenir une information obstétricale claire, bienveillante et accessible, tout en participant à une dynamique de prévention et de transmission.</p>
+    <p class="eyebrow">Nous soutenir</p>
+    <h1>Rejoindre et soutenir La Quinzaine Obstetricale</h1>
+    <p>Adherer, devenir partenaire, faire un don ou proposer du benevolat permet de renforcer les actions pour la sante des femmes et la perinatalite en Guyane.</p>
     <div class="hero-actions">
-        <a class="btn primary" href="mailto:contact@quinzaine-obstetricale.test?subject=Demande%20d'adhesion">Demander une adhésion</a>
-        <a class="btn secondary" href="{{ route('about') }}">Découvrir la démarche</a>
+        <a class="btn primary" href="mailto:contact@quinzaine-obstetricale.test?subject=Demande%20d'adhesion">Adherer</a>
+        <a class="btn secondary" href="#don">Faire un don</a>
     </div>
 </section>
 
 <section class="resource-grid join-grid">
-    <article><span>Public</span><h2>Soutenir les actions</h2><p>Participer à la diffusion d’une information fiable autour de la grossesse, de la naissance et du post-partum.</p></article>
-    <article><span>Professionnels</span><h2>Partager les pratiques</h2><p>Contribuer aux rencontres, aux ressources et aux temps de coordination entre acteurs du parcours périnatal.</p></article>
-    <article><span>Association</span><h2>Faire vivre le projet</h2><p>Aider au développement du site, des événements et des supports de prévention.</p></article>
-    <article><span>Contact</span><h2>Être rappelé</h2><p>Envoyez une demande d’adhésion, nous reviendrons vers vous avec les modalités.</p></article>
+    <article><span>Adhesion</span><h2>Adherer</h2><p>Participer a la vie associative et soutenir les actions d'information, de formation et de prevention.</p></article>
+    <article><span>Partenariat</span><h2>Devenir partenaire</h2><p>Construire des projets avec l'association, partager des ressources et amplifier l'impact territorial.</p></article>
+    <article id="don"><span>Don</span><h2>Faire un don</h2><p>Contribuer au developpement des campagnes, evenements, supports pedagogiques et actions locales.</p></article>
+    <article><span>Terrain</span><h2>Benevolat</h2><p>Donner du temps pour l'accueil, la logistique, la sensibilisation ou l'appui aux manifestations.</p></article>
 </section>
 @endsection

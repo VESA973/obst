@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'La Quinzaine Obstetricale')</title>
-    <meta name="description" content="@yield('description', 'La Quinzaine Obstetricale accompagne le public et les professionnels autour de la sante obstetricale.')">
+    <meta name="description" content="@yield('description', 'La Quinzaine Obstetricale agit pour la sante des femmes et de la perinatalite en Guyane.')">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -17,6 +17,11 @@
             <div class="header-actions" aria-label="Actions rapides">
                 @auth
                     <span class="account-chip">{{ auth()->user()->name }}</span>
+                    @if (auth()->user()->is_admin)
+                        <a href="{{ route('admin.dashboard') }}">Admin</a>
+                    @elseif (! \App\Models\User::where('is_admin', true)->exists())
+                        <a href="{{ route('admin.bootstrap') }}">Initialiser admin</a>
+                    @endif
                     <form method="POST" action="{{ route('professional.logout') }}">
                         @csrf
                         <button type="submit">Deconnexion</button>
@@ -29,18 +34,22 @@
                         <span>Creer un compte</span>
                     </button>
                 @endauth
-                <a class="nav-join" href="{{ route('join') }}">Adherer</a>
+                <a class="nav-join" href="{{ route('join') }}">Nous soutenir</a>
             </div>
         </div>
 
         <div class="header-bottom">
-            <span class="header-note">Information, prevention et coordination obstetricale</span>
+            <span class="header-note">Sante des femmes et perinatalite en Guyane</span>
             <nav class="main-nav" aria-label="Navigation principale">
                 <a href="{{ route('home') }}" @class(['active' => request()->routeIs('home')])>Accueil</a>
-                <a href="{{ route('about') }}" @class(['active' => request()->routeIs('about')])>Qui sommes nous</a>
-                <a href="{{ route('public') }}" @class(['active' => request()->routeIs('public')])>Espace public</a>
+                <a href="{{ route('about') }}" @class(['active' => request()->routeIs('about')])>L'association</a>
+                <a href="{{ route('actions') }}" @class(['active' => request()->routeIs('actions')])>Nos actions</a>
+                <a href="{{ route('public') }}" @class(['active' => request()->routeIs('public')])>Sante des femmes</a>
                 <a href="{{ route('pro') }}" @class(['active' => request()->routeIs('pro')])>Espace pro</a>
+                <a href="{{ route('news') }}" @class(['active' => request()->routeIs('news')])>Actualites</a>
                 <a href="{{ route('agenda') }}" @class(['active' => request()->routeIs('agenda')])>Agenda</a>
+                <a href="{{ route('research') }}" @class(['active' => request()->routeIs('research')])>Recherche</a>
+                <a href="{{ route('contact') }}" @class(['active' => request()->routeIs('contact')])>Contact</a>
             </nav>
         </div>
     </header>
@@ -98,17 +107,12 @@
         @yield('content')
     </main>
 
-    <aside class="don-widget" aria-label="Soutenir l'association">
-        <span>Votre don soutient l'information et la prevention.</span>
-        <a href="#don">Faire un don</a>
-    </aside>
-
-    <footer class="site-footer" id="don">
+    <footer class="site-footer" id="footer-don">
         <div>
             <strong>La Quinzaine Obstetricale</strong>
-            <p>Informer, orienter et rassembler autour d'une obstetrique attentive, accessible et fondee sur les bonnes pratiques.</p>
+            <p>Association guyanaise dediee a la sante des femmes, a la perinatalite, a la prevention et a la transmission.</p>
         </div>
-        <a class="footer-don" href="mailto:contact@quinzaine-obstetricale.test">Nous soutenir</a>
+        <a class="footer-don" href="{{ route('join') }}">Nous soutenir</a>
     </footer>
 </body>
 </html>
