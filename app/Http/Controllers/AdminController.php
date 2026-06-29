@@ -123,7 +123,7 @@ class AdminController extends Controller
             'pages.*.title_size' => ['required', Rule::in(['small', 'normal', 'large'])],
             'pages.*.show_in_menu' => ['nullable', 'boolean'],
             'hero_images' => ['nullable', 'array'],
-            'hero_images.*' => ['nullable', 'image', 'max:4096'],
+            'hero_images.*' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,svg', 'max:20480'],
         ]);
 
         foreach ($attributes['pages'] as $pageKey => $pageAttributes) {
@@ -382,7 +382,7 @@ class AdminController extends Controller
             'description' => ['nullable', 'string', 'max:2000'],
             'image' => ['nullable', 'file', 'max:20480'],
             'photos' => ['nullable', 'array'],
-            'photos.*' => ['image', 'max:10240'],
+            'photos.*' => ['file', 'extensions:jpg,jpeg,png,webp,gif,svg', 'max:20480'],
             'documents' => ['nullable', 'array'],
             'documents.*' => ['file', 'max:10240'],
             'document_titles' => ['nullable', 'array'],
@@ -467,9 +467,9 @@ class AdminController extends Controller
             'category' => ['nullable', 'string', 'max:120'],
             'source_name' => ['nullable', 'string', 'max:120'],
             'external_url' => ['nullable', 'url', 'max:255'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,svg', 'max:20480'],
             'photos' => ['nullable', 'array'],
-            'photos.*' => ['image', 'max:4096'],
+            'photos.*' => ['file', 'extensions:jpg,jpeg,png,webp,gif,svg', 'max:20480'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'body' => ['nullable', 'string', 'max:10000'],
             'published_at' => ['nullable', 'date'],

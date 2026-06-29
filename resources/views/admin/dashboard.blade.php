@@ -142,7 +142,7 @@
                             </select>
                             <label>
                                 Image d'entete
-                                <input name="hero_images[{{ $pageKey }}]" type="file" accept="image/*">
+                                <input name="hero_images[{{ $pageKey }}]" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*">
                             </label>
                             <textarea name="pages[{{ $pageKey }}][description]" placeholder="Description de l'entete">{{ $page['description'] }}</textarea>
                             <label class="admin-check">
@@ -202,11 +202,11 @@
                 <input name="published_at" type="datetime-local">
                 <label>
                     Image principale
-                    <input name="image" type="file" accept="image/*">
+                    <input name="image" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*">
                 </label>
                 <label>
                     Photos supplementaires
-                    <input name="photos[]" type="file" accept="image/*" multiple>
+                    <input name="photos[]" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*" multiple>
                 </label>
                 <textarea name="excerpt" placeholder="Resume court"></textarea>
                 <textarea name="body" placeholder="Article redige sur le site"></textarea>
@@ -266,11 +266,11 @@
                             <input name="published_at" type="datetime-local" value="{{ optional($article->published_at)->format('Y-m-d\TH:i') }}">
                             <label>
                                 Remplacer l'image principale
-                                <input name="image" type="file" accept="image/*">
+                                <input name="image" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*">
                             </label>
                             <label>
                                 Ajouter des photos
-                                <input name="photos[]" type="file" accept="image/*" multiple>
+                                <input name="photos[]" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*" multiple>
                             </label>
                             <textarea name="excerpt" placeholder="Resume">{{ $article->excerpt }}</textarea>
                             <textarea name="body" placeholder="Article">{{ $article->body }}</textarea>
@@ -448,7 +448,7 @@
                 </div>
                 <label>
                     Photos supplementaires
-                    <input name="photos[]" type="file" accept="image/*" multiple>
+                    <input name="photos[]" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*" multiple>
                 </label>
                 <div class="document-fields">
                     <strong>Documents associes</strong>
@@ -529,7 +529,7 @@
                             </div>
                             <label>
                                 Ajouter des photos
-                                <input name="photos[]" type="file" accept="image/*" multiple>
+                                <input name="photos[]" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*" multiple>
                             </label>
                             <div class="document-fields">
                                 <strong>Ajouter des documents</strong>

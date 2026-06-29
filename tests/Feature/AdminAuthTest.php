@@ -227,6 +227,36 @@ class AdminAuthTest extends TestCase
             ->assertSee('/images/page-headers/quinzaine-page-example.png', false);
     }
 
+    public function test_admin_can_upload_png_page_header(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.pages.update'), [
+                'pages' => [
+                    'about' => [
+                        'menu_label' => 'Qui sommes nous',
+                        'eyebrow' => 'Association',
+                        'title' => 'Notre equipe',
+                        'description' => 'Entete avec image PNG.',
+                        'title_size' => 'normal',
+                        'show_in_menu' => '1',
+                    ],
+                ],
+                'hero_images' => [
+                    'about' => new UploadedFile(public_path('images/quinzaine-hero.png'), 'entete.png', 'image/png', null, true),
+                ],
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('page_settings', [
+            'page_key' => 'about',
+        ]);
+    }
+
     public function test_non_admin_cannot_login_to_admin(): void
     {
         User::factory()->create([
