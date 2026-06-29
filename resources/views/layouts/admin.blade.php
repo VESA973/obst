@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Administration | La Quinzaine Obstetricale')</title>
+    <title>@yield('title', 'Administration | La Quinzaine Obstétricale')</title>
     <meta name="robots" content="noindex, nofollow">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -15,7 +15,7 @@
 
         @if ($errors->any())
             <div class="flash-message admin-flash form-error-summary">
-                <strong>La modification n'a pas ete enregistree.</strong>
+                <strong>La modification n'a pas été enregistrée.</strong>
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>

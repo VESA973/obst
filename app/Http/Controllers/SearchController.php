@@ -20,10 +20,10 @@ class SearchController extends Controller
         $pages = collect([
             ['title' => "L'association", 'type' => 'Page', 'url' => route('about'), 'text' => 'association mission equipe quinzaine obstetricale'],
             ['title' => 'Nos actions', 'type' => 'Page', 'url' => route('actions'), 'text' => 'actions prevention formation information terrain'],
-            ['title' => 'Sante des femmes', 'type' => 'Page', 'url' => route('public'), 'text' => 'sante femmes prevention public ressources'],
+            ['title' => 'Santé de la femme', 'type' => 'Page', 'url' => route('public'), 'text' => 'sante femmes prevention public ressources'],
             ['title' => 'Espace pro', 'type' => 'Page', 'url' => route('pro'), 'text' => 'professionnels ressources connexion dossiers'],
             ['title' => 'Agenda', 'type' => 'Page', 'url' => route('agenda'), 'text' => 'agenda evenement inscription atelier conference'],
-            ['title' => 'Actualites', 'type' => 'Page', 'url' => route('news'), 'text' => 'actualites articles presse publications'],
+            ['title' => 'Actualités', 'type' => 'Page', 'url' => route('news'), 'text' => 'actualites articles presse publications'],
             ['title' => 'Contact', 'type' => 'Page', 'url' => route('contact'), 'text' => 'contact email reseaux adresse'],
         ])->filter(fn (array $page) => str_contains(mb_strtolower($page['title'].' '.$page['text']), mb_strtolower($query)))
             ->take(4)

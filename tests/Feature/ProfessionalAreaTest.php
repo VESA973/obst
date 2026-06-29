@@ -14,7 +14,7 @@ class ProfessionalAreaTest extends TestCase
     {
         $this->get('/espace-pro')
             ->assertOk()
-            ->assertSee('Accedez aux contenus reserves')
+            ->assertSee('Accédez aux contenus réservés')
             ->assertDontSee('Consulter les dossiers');
     }
 
@@ -26,7 +26,7 @@ class ProfessionalAreaTest extends TestCase
             ->get('/espace-pro')
             ->assertOk()
             ->assertSee('Consulter les dossiers')
-            ->assertSee('Reserve pro')
+            ->assertSee('Réservé pro')
             ->assertDontSee('Creer un compte pro');
     }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Connexion admin | La Quinzaine Obstetricale')
+@section('title', 'Connexion admin | La Quinzaine Obstétricale')
 
 @section('content')
 <section class="admin-login-screen">
@@ -8,7 +8,7 @@
         <div>
             <p class="eyebrow">Administration</p>
             <h1>Connexion admin</h1>
-            <p>Acces reserve a la gestion du site, des actualites, des evenements, des fichiers et des utilisateurs.</p>
+            <p>Accès réservé à la gestion du site, des actualités, des événements, des fichiers et des utilisateurs.</p>
         </div>
 
         <form class="admin-login-form" method="POST" action="{{ route('admin.login.store') }}">
@@ -34,7 +34,7 @@
                 Garder la session ouverte
             </label>
 
-            <button type="submit">Entrer dans l admin</button>
+            <button type="submit">Entrer dans l'admin</button>
         </form>
     </div>
 </section>

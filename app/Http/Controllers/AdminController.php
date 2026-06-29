@@ -273,7 +273,7 @@ class AdminController extends Controller
         Storage::disk('public')->delete($asset->path);
         $asset->delete();
 
-        return back()->with('status', 'Photo actualite supprimee.');
+        return back()->with('status', 'Photo actualité supprimée.');
     }
 
     public function storeEvent(Request $request): RedirectResponse
@@ -281,7 +281,7 @@ class AdminController extends Controller
         $event = Event::create($this->eventAttributes($request));
         $this->storeEventAssets($request, $event);
 
-        return back()->with('status', 'Evenement ajoute.');
+        return back()->with('status', 'Événement ajouté.');
     }
 
     public function updateEvent(Request $request, Event $event): RedirectResponse
@@ -295,7 +295,7 @@ class AdminController extends Controller
         $event->update($attributes);
         $this->storeEventAssets($request, $event);
 
-        return back()->with('status', 'Evenement mis a jour.');
+        return back()->with('status', 'Événement mis à jour.');
     }
 
     public function destroyEvent(Event $event): RedirectResponse
@@ -310,7 +310,7 @@ class AdminController extends Controller
 
         $event->delete();
 
-        return back()->with('status', 'Evenement supprime.');
+        return back()->with('status', 'Événement supprimé.');
     }
 
     public function destroyEventAsset(EventAsset $asset): RedirectResponse
@@ -318,7 +318,7 @@ class AdminController extends Controller
         Storage::disk('public')->delete($asset->path);
         $asset->delete();
 
-        return back()->with('status', 'Fichier evenement supprime.');
+        return back()->with('status', 'Fichier événement supprimé.');
     }
 
     public function storeUser(Request $request): RedirectResponse

@@ -25,7 +25,7 @@ class ProfessionalAuthController extends Controller
 
         return redirect()
             ->route('pro')
-            ->with('status', 'Votre compte professionnel est cree. Vous avez maintenant acces au contenu exclusif.');
+            ->with('status', 'Votre compte professionnel est créé. Vous avez maintenant accès au contenu exclusif.');
     }
 
     public function login(Request $request): RedirectResponse

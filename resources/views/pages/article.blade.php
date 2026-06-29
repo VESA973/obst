@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', $article->title.' | La Quinzaine Obstetricale')
+@section('title', $article->title.' | La Quinzaine Obstétricale')
 
 @section('content')
 @php

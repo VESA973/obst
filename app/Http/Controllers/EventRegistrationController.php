@@ -17,7 +17,7 @@ class EventRegistrationController extends Controller
 
         if ($event->registration_capacity && $event->registrations()->count() >= $event->registration_capacity) {
             throw ValidationException::withMessages([
-                'email' => 'Cet evenement est complet.',
+                'email' => 'Cet événement est complet.',
             ]);
         }
 

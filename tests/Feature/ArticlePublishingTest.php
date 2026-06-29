@@ -132,7 +132,7 @@ class ArticlePublishingTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.articles.index'))
             ->assertOk()
-            ->assertSee('12 actualite(s)')
+            ->assertSee('12 actualité(s)')
             ->assertSee('Article pagination 12')
             ->assertSee('Article pagination 03')
             ->assertDontSee('Article pagination 02');

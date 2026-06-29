@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', 'Agenda | La Quinzaine Obstetricale')
+@section('title', 'Agenda | La Quinzaine Obstétricale')
 
 @section('content')
 <x-page-hero page-key="agenda" />
@@ -13,7 +13,7 @@
         @endphp
         <details id="event-{{ $event->id }}" class="event-card">
             <summary class="event-summary">
-                <time>{{ $event->event_date ? $event->event_date->translatedFormat('d M') : 'A venir' }}</time>
+                <time>{{ $event->event_date ? $event->event_date->translatedFormat('d M') : 'À venir' }}</time>
                 <span class="event-thumb">
                     @if ($event->image_path)
                         @if ($event->flyer_is_image)
@@ -31,7 +31,7 @@
                         <span>{{ $event->location }}</span>
                     @endif
                 </span>
-                <span class="event-summary-action">Voir le detail</span>
+                <span class="event-summary-action">Voir le détail</span>
             </summary>
 
             <div class="event-detail">
@@ -72,7 +72,7 @@
                                         de {{ $slot['start_time'] }}
                                     @endif
                                     @if (! empty($slot['end_time']))
-                                        a {{ $slot['end_time'] }}
+                                        à {{ $slot['end_time'] }}
                                     @endif
                                 </span>
                             @endforeach
@@ -93,7 +93,7 @@
                         <div class="event-documents">
                             @foreach ($documents as $document)
                                 <a href="{{ Storage::url($document->path) }}" target="_blank" rel="noreferrer">
-                                    {{ $document->title ?: $document->original_name ?: 'Document associe' }}
+                                    {{ $document->title ?: $document->original_name ?: 'Document associé' }}
                                 </a>
                             @endforeach
                         </div>
@@ -102,7 +102,7 @@
                         <img src="{{ route('events.qr', $event) }}" alt="QR code inscription {{ $event->title }}">
                         <div>
                             <strong>QR code inscription</strong>
-                            <span>{{ $event->is_paid ? 'Scannez pour ouvrir HelloAsso.' : 'Scannez pour ouvrir cet evenement.' }}</span>
+                            <span>{{ $event->is_paid ? 'Scannez pour ouvrir HelloAsso.' : 'Scannez pour ouvrir cet événement.' }}</span>
                             <a href="{{ route('events.qr', $event) }}" target="_blank" rel="noreferrer">Ouvrir le QR code</a>
                         </div>
                     </div>
@@ -115,7 +115,7 @@
                             @csrf
                             <input name="name" placeholder="Nom complet" required>
                             <input name="email" type="email" placeholder="Email" required>
-                            <input name="phone" placeholder="Telephone">
+                            <input name="phone" placeholder="Téléphone">
                             <textarea name="notes" placeholder="Message optionnel"></textarea>
                             <button type="submit">S'inscrire gratuitement</button>
                             @if ($event->registration_capacity)
@@ -129,11 +129,11 @@
     @empty
         <article>
             <time>Sept.</time>
-            <div><h2>Les Jeudis M</h2><p>Rencontre autour de la menopause, de la prevention et de la qualite de vie. <a href="{{ route('contact') }}">S'inscrire</a></p></div>
+            <div><h2>Les Jeudis M</h2><p>Rencontre autour de la ménopause, de la prévention et de la qualité de vie. <a href="{{ route('contact') }}">S'inscrire</a></p></div>
         </article>
         <article>
             <time>Oct.</time>
-            <div><h2>Escape Game Sante</h2><p>Animation de prevention pour apprendre autrement, en equipe et sur le terrain. <a href="{{ route('contact') }}">S'inscrire</a></p></div>
+            <div><h2>Escape Game Santé</h2><p>Animation de prévention pour apprendre autrement, en équipe et sur le terrain. <a href="{{ route('contact') }}">S'inscrire</a></p></div>
         </article>
         <article>
             <time>Nov.</time>

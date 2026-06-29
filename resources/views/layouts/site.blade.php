@@ -3,15 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'La Quinzaine Obstetricale')</title>
-    <meta name="description" content="@yield('description', 'La Quinzaine Obstetricale agit pour la sante des femmes et de la perinatalite en Guyane.')">
+    <title>@yield('title', 'La Quinzaine Obstétricale')</title>
+    <meta name="description" content="@yield('description', 'La Quinzaine Obstétricale agit pour la santé de la femme et de la périnatalité en Guyane.')">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <header class="site-header">
         <div class="header-top">
-            <a class="brand" href="{{ route('home') }}" aria-label="Accueil La Quinzaine Obstetricale">
-                <img class="brand-logo" src="{{ asset('images/quinzaine-logo.jpeg') }}" alt="Quinzaine Obstetricale CHAR">
+            <a class="brand" href="{{ route('home') }}" aria-label="Accueil La Quinzaine Obstétricale">
+                <img class="brand-logo" src="{{ asset('images/quinzaine-logo.jpeg') }}" alt="Quinzaine Obstétricale CHAR">
             </a>
 
             <div class="header-actions" aria-label="Actions rapides">
@@ -19,7 +19,7 @@
                     <span class="account-chip">{{ auth()->user()->name }}</span>
                     <form method="POST" action="{{ route('professional.logout') }}">
                         @csrf
-                        <button type="submit">Deconnexion</button>
+                        <button type="submit">Déconnexion</button>
                     </form>
                 @else
                     <button class="create-account-trigger" type="button" data-open-register>
@@ -34,32 +34,33 @@
         </div>
 
         <div class="header-bottom">
-            <span class="header-note">Sante des femmes et perinatalite en Guyane</span>
+            <span class="header-note">Santé de la femme et périnatalité en Guyane</span>
             <nav class="main-nav" aria-label="Navigation principale">
                 <a href="{{ route('home') }}" @class(['active' => request()->routeIs('home')])>Accueil</a>
                 @foreach ($siteMenuPages as $menuPage)
-                    <a href="{{ route($menuPage['route']) }}" @class(['active' => request()->routeIs($menuPage['route'])])>{{ $menuPage['menu_label'] }}</a>
+                    @if ($menuPage['page_key'] === 'about')
+                        @php($actionsPage = \App\Models\PageSetting::forKey('actions'))
+                        <div @class(['nav-dropdown', 'active' => request()->routeIs('about') || request()->routeIs('actions')])>
+                            <a href="{{ route($menuPage['route']) }}" @class(['active' => request()->routeIs($menuPage['route'])])>{{ $menuPage['menu_label'] }}</a>
+                            <div class="nav-submenu" aria-label="Sous-menu association">
+                                <a href="{{ route('actions') }}" @class(['active' => request()->routeIs('actions')])>{{ $actionsPage['menu_label'] ?? 'Nos actions' }}</a>
+                            </div>
+                        </div>
+                    @elseif ($menuPage['page_key'] !== 'actions' && $menuPage['page_key'] !== 'research')
+                        <a href="{{ route($menuPage['route']) }}" @class(['active' => request()->routeIs($menuPage['route'])])>{{ $menuPage['menu_label'] }}</a>
+                    @endif
                 @endforeach
             </nav>
-            <div class="site-search" data-site-search>
-                <label for="site-search-input" aria-label="Rechercher sur le site">
-                    <svg aria-hidden="true" viewBox="0 0 24 24">
-                        <path d="M10.8 4a6.8 6.8 0 1 1-4.81 11.61A6.8 6.8 0 0 1 10.8 4Zm0 2a4.8 4.8 0 1 0 3.39 8.19A4.8 4.8 0 0 0 10.8 6Zm5.66 9.04 3.25 3.25-1.42 1.42-3.25-3.25 1.42-1.42Z"/>
-                    </svg>
-                    <input id="site-search-input" type="search" placeholder="Rechercher" autocomplete="off" data-search-input data-search-url="{{ route('search') }}">
-                </label>
-                <div class="search-results" data-search-results hidden></div>
-            </div>
         </div>
     </header>
 
     @guest
         <dialog class="register-modal" id="register-modal" aria-labelledby="register-modal-title">
-            <button class="modal-close" type="button" data-close-register aria-label="Fermer la fenetre">&times;</button>
+            <button class="modal-close" type="button" data-close-register aria-label="Fermer la fenêtre">&times;</button>
             <div class="modal-heading">
                 <p class="eyebrow">Compte professionnel</p>
                 <h2 id="register-modal-title">Espace pro</h2>
-                <p>Connectez-vous a votre compte professionnel ou creez un acces avec votre email.</p>
+                <p>Connectez-vous à votre compte professionnel ou créez un accès avec votre email.</p>
             </div>
 
             <div class="pro-auth-modal-grid">
@@ -74,7 +75,7 @@
 
                     <label class="check-row">
                         <input name="remember" type="checkbox" value="1">
-                        <span>Rester connecte</span>
+                        <span>Rester connecté</span>
                     </label>
 
                     @error('email')
@@ -108,7 +109,7 @@
                     <label for="modal-register-password-confirmation">Confirmer le mot de passe</label>
                     <input id="modal-register-password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
 
-                    <button type="submit">Creer mon acces</button>
+                    <button type="submit">Créer mon accès</button>
                 </form>
             </div>
         </dialog>
@@ -124,8 +125,8 @@
 
     <footer class="site-footer" id="footer-don">
         <div>
-            <strong>La Quinzaine Obstetricale</strong>
-            <p>Association guyanaise dediee a la sante des femmes, a la perinatalite, a la prevention et a la transmission.</p>
+            <strong>La Quinzaine Obstétricale</strong>
+            <p>Association guyanaise dédiée à la santé de la femme, à la périnatalité, à la prévention et à la transmission.</p>
         </div>
         <a class="footer-don" href="{{ route('join') }}">Nous soutenir</a>
     </footer>

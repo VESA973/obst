@@ -71,6 +71,17 @@ class AdminAuthTest extends TestCase
             ->assertDontSee("L'association");
     }
 
+    public function test_public_navigation_uses_association_submenu_and_hides_search(): void
+    {
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('nav-submenu', false)
+            ->assertSee('Nos actions')
+            ->assertSee('Santé de la femme')
+            ->assertDontSee('Recherche')
+            ->assertDontSee('Sante des femmes');
+    }
+
     public function test_admin_can_choose_how_many_events_are_listed(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);
@@ -86,7 +97,7 @@ class AdminAuthTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.events.index'))
             ->assertOk()
-            ->assertSee('12 evenement(s)')
+            ->assertSee('12 événement(s)')
             ->assertSee('Evenement pagination 01')
             ->assertSee('Evenement pagination 10')
             ->assertDontSee('Evenement pagination 11');

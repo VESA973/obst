@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', 'Contact | La Quinzaine Obstetricale')
+@section('title', 'Contact | La Quinzaine Obstétricale')
 
 @section('content')
 <x-page-hero page-key="contact" />
@@ -23,7 +23,7 @@
         <article>
             <span>Reseaux sociaux</span>
             <h2>Suivre l'association</h2>
-            <p>Retrouvez les actualites, evenements et campagnes de sensibilisation sur nos reseaux.</p>
+            <p>Retrouvez les actualités, événements et campagnes de sensibilisation sur nos réseaux.</p>
         </article>
         <article>
             <span>Newsletter</span>

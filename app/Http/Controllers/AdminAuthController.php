@@ -39,7 +39,7 @@ class AdminAuthController extends Controller
             $request->session()->regenerateToken();
 
             return back()
-                ->withErrors(['email' => 'Ce compte n a pas acces a l administration.'])
+                ->withErrors(['email' => "Ce compte n'a pas accès à l'administration."])
                 ->onlyInput('email');
         }
 

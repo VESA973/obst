@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', 'Espace professionnels | La Quinzaine Obstetricale')
+@section('title', 'Espace professionnels | La Quinzaine Obstétricale')
 
 @section('content')
 <x-page-hero page-key="pro" class="pro-hero" />
@@ -9,8 +9,8 @@
 <section class="auth-gate auth-gate-top" id="connexion-pro">
     <div class="auth-copy">
         <p class="eyebrow">Connexion professionnelle</p>
-        <h2>Accedez aux contenus reserves</h2>
-        <p>Connectez-vous pour consulter les recommandations, protocoles, formations, replays, bibliotheque et ressources pedagogiques.</p>
+        <h2>Accédez aux contenus réservés</h2>
+        <p>Connectez-vous pour consulter les recommandations, protocoles, formations, replays, bibliothèque et ressources pédagogiques.</p>
     </div>
 
     <div class="auth-forms">
@@ -25,7 +25,7 @@
 
             <label class="check-row">
                 <input name="remember" type="checkbox" value="1">
-                <span>Rester connecte</span>
+                <span>Rester connecté</span>
             </label>
 
             @error('email')
@@ -40,9 +40,9 @@
 
 <section class="pro-intro">
     <div>
-        <p class="eyebrow">Presentation</p>
-        <h2>Un espace concu pour les pratiques de terrain</h2>
-        <p>Les contenus accompagnent la decision, la coordination et la transmission entre acteurs de sante, avec une attention particuliere aux realites guyanaises.</p>
+        <p class="eyebrow">Présentation</p>
+        <h2>Un espace conçu pour les pratiques de terrain</h2>
+        <p>Les contenus accompagnent la décision, la coordination et la transmission entre acteurs de santé, avec une attention particulière aux réalités guyanaises.</p>
     </div>
     <div class="pro-summary">
         <span>Contenu exclusif</span>
@@ -53,39 +53,39 @@
 @auth
 <section class="pro-layout private-content">
     <div class="pro-panel">
-        <span class="private-label">Reserve pro</span>
+        <span class="private-label">Réservé pro</span>
         <h2>Recommandations</h2>
-        <p>Syntheses pratiques, bonnes pratiques et documents de reference pour les equipes.</p>
+        <p>Synthèses pratiques, bonnes pratiques et documents de référence pour les équipes.</p>
         <a href="#">Consulter les dossiers</a>
     </div>
     <div class="pro-panel accent">
-        <span class="private-label">Reserve pro</span>
+        <span class="private-label">Réservé pro</span>
         <h2>Protocoles</h2>
-        <p>Outils d'orientation et supports de coordination entre ville, maternite, reseaux et associations.</p>
+        <p>Outils d'orientation et supports de coordination entre ville, maternité, réseaux et associations.</p>
         <a href="#">Voir les supports</a>
     </div>
     <div class="pro-panel">
-        <span class="private-label">Reserve pro</span>
+        <span class="private-label">Réservé pro</span>
         <h2>Formations</h2>
-        <p>Journees thematiques, webinaires et retours d'experience.</p>
-        <a href="#">Acceder aux formations</a>
+        <p>Journées thématiques, webinaires et retours d'expérience.</p>
+        <a href="#">Accéder aux formations</a>
     </div>
     <div class="pro-panel">
-        <span class="private-label">Reserve pro</span>
+        <span class="private-label">Réservé pro</span>
         <h2>Replays</h2>
-        <p>Videos et supports des rencontres passees pour prolonger la formation.</p>
+        <p>Vidéos et supports des rencontres passées pour prolonger la formation.</p>
         <a href="#">Voir les replays</a>
     </div>
     <div class="pro-panel">
-        <span class="private-label">Reserve pro</span>
-        <h2>Bibliotheque</h2>
-        <p>Articles, publications, notes scientifiques et ressources documentaires classees.</p>
-        <a href="#">Ouvrir la bibliotheque</a>
+        <span class="private-label">Réservé pro</span>
+        <h2>Bibliothèque</h2>
+        <p>Articles, publications, notes scientifiques et ressources documentaires classées.</p>
+        <a href="#">Ouvrir la bibliothèque</a>
     </div>
     <div class="pro-panel">
-        <span class="private-label">Reserve pro</span>
-        <h2>Ressources pedagogiques</h2>
-        <p>Supports d'atelier, fiches patientes, outils de prevention et formats imprimables.</p>
+        <span class="private-label">Réservé pro</span>
+        <h2>Ressources pédagogiques</h2>
+        <p>Supports d'atelier, fiches patientes, outils de prévention et formats imprimables.</p>
         <a href="#">Voir les ressources</a>
     </div>
 </section>
