@@ -6,6 +6,8 @@ use App\Models\Event;
 use App\Models\ResourceFile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminAuthTest extends TestCase
@@ -112,6 +114,37 @@ class AdminAuthTest extends TestCase
             ->assertOk()
             ->assertSee('Atelier perinatalite')
             ->assertSee('Description visible dans la ligne de l evenement.');
+    }
+
+    public function test_admin_can_replace_event_main_flyer(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        Storage::disk('public')->put('events/ancien.jpg', 'ancien flyer');
+        $event = Event::create([
+            'title' => 'Evenement avec flyer',
+            'event_date' => now()->addWeek()->toDateString(),
+            'image_path' => 'events/ancien.jpg',
+            'is_published' => true,
+        ]);
+
+        $oldPath = $event->image_path;
+
+        $this->actingAs($admin)
+            ->put(route('admin.events.update', $event), [
+                'title' => 'Evenement avec nouveau flyer',
+                'event_date' => now()->addWeek()->toDateString(),
+                'image' => new UploadedFile(public_path('images/quinzaine-logo.jpeg'), 'nouveau.jpg', 'image/jpeg', null, true),
+                'is_published' => '1',
+            ])
+            ->assertRedirect();
+
+        $event->refresh();
+
+        $this->assertNotSame($oldPath, $event->image_path);
+        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($event->image_path);
     }
 
     public function test_admin_files_are_displayed_with_clear_metadata(): void
