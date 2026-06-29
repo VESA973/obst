@@ -16,7 +16,11 @@
                 <time>{{ $event->event_date ? $event->event_date->translatedFormat('d M') : 'A venir' }}</time>
                 <span class="event-thumb">
                     @if ($event->image_path)
-                        <img src="{{ Storage::url($event->image_path) }}" alt="">
+                        @if ($event->flyer_is_image)
+                            <img src="{{ Storage::url($event->image_path) }}" alt="">
+                        @else
+                            <span>{{ $event->flyer_extension }}</span>
+                        @endif
                     @else
                         <span>Agenda</span>
                     @endif
@@ -33,9 +37,16 @@
             <div class="event-detail">
                 <div class="event-visual">
                     @if ($event->image_path)
-                        <a href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer" aria-label="Voir le flyer de {{ $event->title }}">
-                            <img src="{{ Storage::url($event->image_path) }}" alt="Flyer {{ $event->title }}">
-                        </a>
+                        @if ($event->flyer_is_image)
+                            <a href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer" aria-label="Voir le flyer de {{ $event->title }}">
+                                <img src="{{ Storage::url($event->image_path) }}" alt="Flyer {{ $event->title }}">
+                            </a>
+                        @else
+                            <a class="event-file-link" href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer">
+                                <span>{{ $event->flyer_extension }}</span>
+                                <strong>Ouvrir le flyer</strong>
+                            </a>
+                        @endif
                     @else
                         <div class="event-placeholder">Agenda</div>
                     @endif

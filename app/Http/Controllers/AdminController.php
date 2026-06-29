@@ -380,7 +380,7 @@ class AdminController extends Controller
             'schedule_end_time.*' => ['nullable', 'date_format:H:i'],
             'location' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
-            'image' => ['nullable', 'image', 'max:10240'],
+            'image' => ['nullable', 'file', 'max:20480'],
             'photos' => ['nullable', 'array'],
             'photos.*' => ['image', 'max:10240'],
             'documents' => ['nullable', 'array'],
@@ -400,7 +400,7 @@ class AdminController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $attributes['image_path'] = $request->file('image')->store('events', 'public');
+            $attributes['image_path'] = $request->file('image')->store('events/flyers', 'public');
         }
 
         unset(

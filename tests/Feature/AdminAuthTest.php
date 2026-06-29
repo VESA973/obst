@@ -135,7 +135,7 @@ class AdminAuthTest extends TestCase
             ->put(route('admin.events.update', $event), [
                 'title' => 'Evenement avec nouveau flyer',
                 'event_date' => now()->addWeek()->toDateString(),
-                'image' => new UploadedFile(public_path('images/quinzaine-logo.jpeg'), 'nouveau.jpg', 'image/jpeg', null, true),
+                'image' => UploadedFile::fake()->create('nouveau-flyer.pdf', 32, 'application/pdf'),
                 'is_published' => '1',
             ])
             ->assertRedirect();
@@ -145,6 +145,27 @@ class AdminAuthTest extends TestCase
         $this->assertNotSame($oldPath, $event->image_path);
         Storage::disk('public')->assertMissing($oldPath);
         Storage::disk('public')->assertExists($event->image_path);
+        $this->assertStringEndsWith('.pdf', $event->image_path);
+    }
+
+    public function test_public_agenda_links_to_non_image_event_flyer(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('events/flyers/programme.pdf', 'programme pdf');
+
+        Event::create([
+            'title' => 'Evenement PDF',
+            'event_date' => now()->addWeek()->toDateString(),
+            'image_path' => 'events/flyers/programme.pdf',
+            'is_published' => true,
+        ]);
+
+        $this->get(route('agenda'))
+            ->assertOk()
+            ->assertSee('Evenement PDF')
+            ->assertSee('PDF')
+            ->assertSee('Ouvrir le flyer')
+            ->assertSee('/storage/events/flyers/programme.pdf', false);
     }
 
     public function test_admin_files_are_displayed_with_clear_metadata(): void

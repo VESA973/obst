@@ -432,8 +432,8 @@
                 <input name="registration_url" type="url" placeholder="Lien HelloAsso si payant">
                 <input name="registration_capacity" type="number" min="1" placeholder="Places gratuites">
                 <label>
-                    Flyer ou miniature principale
-                    <input name="image" type="file" accept="image/*">
+                    Flyer principal
+                    <input name="image" type="file">
                 </label>
                 <div class="schedule-fields">
                     <strong>Dates et horaires</strong>
@@ -513,8 +513,8 @@
                             <input name="registration_url" type="url" value="{{ $event->registration_url }}" placeholder="Lien HelloAsso si payant">
                             <input name="registration_capacity" type="number" min="1" value="{{ $event->registration_capacity }}" placeholder="Places gratuites">
                             <label>
-                                Remplacer le flyer ou la miniature
-                                <input name="image" type="file" accept="image/*">
+                                Remplacer le flyer principal
+                                <input name="image" type="file">
                             </label>
                             <div class="schedule-fields">
                                 <strong>Dates et horaires</strong>
@@ -548,7 +548,7 @@
                         @if ($event->image_path || $photos->isNotEmpty() || $documents->isNotEmpty())
                             <div class="event-assets-admin">
                                 @if ($event->image_path)
-                                    <a href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer">Flyer principal</a>
+                                    <a href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer">Flyer principal {{ $event->flyer_extension }}</a>
                                 @endif
                                 @foreach ($photos as $photo)
                                     <form method="POST" action="{{ route('admin.events.assets.destroy', $photo) }}">

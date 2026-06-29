@@ -42,4 +42,25 @@ class Event extends Model
     {
         return $this->hasMany(EventAsset::class);
     }
+
+    public function getFlyerIsImageAttribute(): bool
+    {
+        if (! $this->image_path) {
+            return false;
+        }
+
+        return in_array(strtolower(pathinfo($this->image_path, PATHINFO_EXTENSION)), [
+            'jpg',
+            'jpeg',
+            'png',
+            'webp',
+            'gif',
+            'svg',
+        ], true);
+    }
+
+    public function getFlyerExtensionAttribute(): string
+    {
+        return strtoupper(pathinfo($this->image_path ?? '', PATHINFO_EXTENSION) ?: 'FICHIER');
+    }
 }
