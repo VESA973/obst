@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Article;
+use App\Models\ArticleAsset;
+use App\Models\ArticleCategory;
 use App\Models\Event;
+use App\Models\EventAsset;
 use App\Models\Member;
 use App\Models\ResourceFile;
 use App\Models\SiteSetting;
@@ -10,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
@@ -19,9 +24,11 @@ class AdminController extends Controller
     public function index(): View
     {
         return view('admin.dashboard', [
+            'articleCategories' => ArticleCategory::withCount('articles')->orderBy('name')->get(),
+            'articles' => Article::with(['assets', 'categoryModel'])->latest('published_at')->latest()->get(),
             'members' => Member::latest()->get(),
             'files' => ResourceFile::latest()->get(),
-            'events' => Event::orderByRaw('event_date IS NULL')->orderBy('event_date')->get(),
+            'events' => Event::with(['registrations', 'assets'])->orderByRaw('event_date IS NULL')->orderBy('event_date')->get(),
             'users' => User::orderByDesc('is_admin')->orderBy('name')->get(),
             'settings' => [
                 'maintenance_enabled' => SiteSetting::getValue('maintenance_enabled', '0'),
@@ -109,25 +116,115 @@ class AdminController extends Controller
         return back()->with('status', 'Fichier supprime.');
     }
 
+    public function storeArticleCategory(Request $request): RedirectResponse
+    {
+        $attributes = $request->validate([
+            'name' => ['required', 'string', 'max:120', 'unique:article_categories,name'],
+        ]);
+
+        ArticleCategory::create([
+            'name' => $attributes['name'],
+            'slug' => $this->uniqueCategorySlug($attributes['name']),
+        ]);
+
+        return back()->with('status', 'Categorie ajoutee.');
+    }
+
+    public function destroyArticleCategory(ArticleCategory $category): RedirectResponse
+    {
+        $category->delete();
+
+        return back()->with('status', 'Categorie supprimee.');
+    }
+
+    public function storeArticle(Request $request): RedirectResponse
+    {
+        $article = Article::create($this->articleAttributes($request, publishByDefault: true));
+        $this->storeArticleAssets($request, $article);
+
+        return back()->with('status', 'Actualite ajoutee.');
+    }
+
+    public function updateArticle(Request $request, Article $article): RedirectResponse
+    {
+        $attributes = $this->articleAttributes($request, $article);
+
+        if (isset($attributes['image_path']) && $article->image_path) {
+            Storage::disk('public')->delete($article->image_path);
+        }
+
+        $article->update($attributes);
+        $this->storeArticleAssets($request, $article);
+
+        return back()->with('status', 'Actualite mise a jour.');
+    }
+
+    public function destroyArticle(Article $article): RedirectResponse
+    {
+        if ($article->image_path) {
+            Storage::disk('public')->delete($article->image_path);
+        }
+
+        foreach ($article->assets as $asset) {
+            Storage::disk('public')->delete($asset->path);
+        }
+
+        $article->delete();
+
+        return back()->with('status', 'Actualite supprimee.');
+    }
+
+    public function destroyArticleAsset(ArticleAsset $asset): RedirectResponse
+    {
+        Storage::disk('public')->delete($asset->path);
+        $asset->delete();
+
+        return back()->with('status', 'Photo actualite supprimee.');
+    }
+
     public function storeEvent(Request $request): RedirectResponse
     {
-        Event::create($this->eventAttributes($request));
+        $event = Event::create($this->eventAttributes($request));
+        $this->storeEventAssets($request, $event);
 
         return back()->with('status', 'Evenement ajoute.');
     }
 
     public function updateEvent(Request $request, Event $event): RedirectResponse
     {
-        $event->update($this->eventAttributes($request));
+        $attributes = $this->eventAttributes($request);
+
+        if (isset($attributes['image_path']) && $event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+        }
+
+        $event->update($attributes);
+        $this->storeEventAssets($request, $event);
 
         return back()->with('status', 'Evenement mis a jour.');
     }
 
     public function destroyEvent(Event $event): RedirectResponse
     {
+        if ($event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+        }
+
+        foreach ($event->assets as $asset) {
+            Storage::disk('public')->delete($asset->path);
+        }
+
         $event->delete();
 
         return back()->with('status', 'Evenement supprime.');
+    }
+
+    public function destroyEventAsset(EventAsset $asset): RedirectResponse
+    {
+        Storage::disk('public')->delete($asset->path);
+        $asset->delete();
+
+        return back()->with('status', 'Fichier evenement supprime.');
     }
 
     public function storeUser(Request $request): RedirectResponse
@@ -179,14 +276,161 @@ class AdminController extends Controller
         $attributes = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'event_date' => ['nullable', 'date'],
+            'schedule_label' => ['nullable', 'array'],
+            'schedule_label.*' => ['nullable', 'string', 'max:120'],
+            'schedule_date' => ['nullable', 'array'],
+            'schedule_date.*' => ['nullable', 'date'],
+            'schedule_start_time' => ['nullable', 'array'],
+            'schedule_start_time.*' => ['nullable', 'date_format:H:i'],
+            'schedule_end_time' => ['nullable', 'array'],
+            'schedule_end_time.*' => ['nullable', 'date_format:H:i'],
             'location' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
-            'registration_url' => ['nullable', 'url', 'max:255'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'photos' => ['nullable', 'array'],
+            'photos.*' => ['image', 'max:4096'],
+            'documents' => ['nullable', 'array'],
+            'documents.*' => ['file', 'max:10240'],
+            'document_titles' => ['nullable', 'array'],
+            'document_titles.*' => ['nullable', 'string', 'max:255'],
+            'registration_url' => ['nullable', 'url', 'max:255', 'required_if:is_paid,1'],
+            'is_paid' => ['nullable', 'boolean'],
+            'registration_capacity' => ['nullable', 'integer', 'min:1', 'max:10000'],
             'is_published' => ['nullable', 'boolean'],
         ]);
 
+        $attributes['schedule_items'] = $this->scheduleItems($request);
+
+        if (! $attributes['event_date'] && $attributes['schedule_items']) {
+            $attributes['event_date'] = $attributes['schedule_items'][0]['date'];
+        }
+
+        if ($request->hasFile('image')) {
+            $attributes['image_path'] = $request->file('image')->store('events', 'public');
+        }
+
+        unset(
+            $attributes['image'],
+            $attributes['photos'],
+            $attributes['documents'],
+            $attributes['document_titles'],
+            $attributes['schedule_label'],
+            $attributes['schedule_date'],
+            $attributes['schedule_start_time'],
+            $attributes['schedule_end_time'],
+        );
+        $attributes['is_paid'] = $request->boolean('is_paid');
         $attributes['is_published'] = $request->boolean('is_published');
 
         return $attributes;
+    }
+
+    private function scheduleItems(Request $request): array
+    {
+        $items = [];
+
+        foreach ($request->input('schedule_date', []) as $index => $date) {
+            if (blank($date)) {
+                continue;
+            }
+
+            $items[] = [
+                'label' => $request->input("schedule_label.$index"),
+                'date' => $date,
+                'start_time' => $request->input("schedule_start_time.$index"),
+                'end_time' => $request->input("schedule_end_time.$index"),
+            ];
+        }
+
+        return $items;
+    }
+
+    private function storeEventAssets(Request $request, Event $event): void
+    {
+        foreach ($request->file('photos', []) as $photo) {
+            $event->assets()->create([
+                'type' => 'photo',
+                'path' => $photo->store('events/photos', 'public'),
+                'original_name' => $photo->getClientOriginalName(),
+            ]);
+        }
+
+        foreach ($request->file('documents', []) as $index => $document) {
+            $event->assets()->create([
+                'type' => 'document',
+                'path' => $document->store('events/documents', 'public'),
+                'original_name' => $document->getClientOriginalName(),
+                'title' => $request->input("document_titles.$index"),
+            ]);
+        }
+    }
+
+    private function articleAttributes(Request $request, ?Article $article = null, bool $publishByDefault = false): array
+    {
+        $attributes = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'article_category_id' => ['nullable', 'exists:article_categories,id'],
+            'category' => ['nullable', 'string', 'max:120'],
+            'source_name' => ['nullable', 'string', 'max:120'],
+            'external_url' => ['nullable', 'url', 'max:255'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'photos' => ['nullable', 'array'],
+            'photos.*' => ['image', 'max:4096'],
+            'excerpt' => ['nullable', 'string', 'max:500'],
+            'body' => ['nullable', 'string', 'max:10000'],
+            'published_at' => ['nullable', 'date'],
+            'is_published' => ['nullable', 'boolean'],
+        ]);
+
+        $attributes['slug'] = $this->uniqueSlug($attributes['title'], $article);
+        $attributes['is_published'] = $publishByDefault ? $request->boolean('is_published', true) : $request->boolean('is_published');
+        $attributes['published_at'] = $attributes['published_at'] ?? now();
+
+        if ($request->hasFile('image')) {
+            $attributes['image_path'] = $request->file('image')->store('articles', 'public');
+        }
+
+        unset($attributes['image'], $attributes['photos']);
+
+        return $attributes;
+    }
+
+    private function storeArticleAssets(Request $request, Article $article): void
+    {
+        foreach ($request->file('photos', []) as $photo) {
+            $article->assets()->create([
+                'type' => 'photo',
+                'path' => $photo->store('articles/photos', 'public'),
+                'original_name' => $photo->getClientOriginalName(),
+            ]);
+        }
+    }
+
+    private function uniqueSlug(string $title, ?Article $article = null): string
+    {
+        $base = Str::slug($title) ?: 'actualite';
+        $slug = $base;
+        $counter = 2;
+
+        while (Article::where('slug', $slug)->when($article, fn ($query) => $query->whereKeyNot($article->id))->exists()) {
+            $slug = $base.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    private function uniqueCategorySlug(string $name): string
+    {
+        $base = Str::slug($name) ?: 'categorie';
+        $slug = $base;
+        $counter = 2;
+
+        while (ArticleCategory::where('slug', $slug)->exists()) {
+            $slug = $base.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

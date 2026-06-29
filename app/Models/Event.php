@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
 {
@@ -12,9 +13,13 @@ class Event extends Model
     protected $fillable = [
         'title',
         'event_date',
+        'schedule_items',
         'location',
         'description',
+        'image_path',
         'registration_url',
+        'is_paid',
+        'registration_capacity',
         'is_published',
     ];
 
@@ -22,7 +27,19 @@ class Event extends Model
     {
         return [
             'event_date' => 'date',
+            'schedule_items' => 'array',
+            'is_paid' => 'boolean',
             'is_published' => 'boolean',
         ];
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(EventRegistration::class);
+    }
+
+    public function assets(): HasMany
+    {
+        return $this->hasMany(EventAsset::class);
     }
 }

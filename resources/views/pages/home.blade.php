@@ -37,21 +37,29 @@
         <p class="eyebrow">Actualites</p>
         <h2>Les actualites</h2>
     </div>
-    <article class="feature-card">
-        <span>Tribune</span>
-        <h3>Parler sante des femmes en Guyane</h3>
-        <p>Regards croises sur les besoins, les freins d'acces et les leviers d'action.</p>
-    </article>
-    <article class="feature-card">
-        <span>Interview</span>
-        <h3>Voix de terrain</h3>
-        <p>Professionnels et partenaires partagent leurs experiences de prevention.</p>
-    </article>
-    <article class="feature-card">
-        <span>Publication</span>
-        <h3>Nouvelles ressources</h3>
-        <p>Supports simples pour accompagner les grandes etapes de la vie des femmes.</p>
-    </article>
+    @forelse ($latestArticles as $article)
+        <article class="feature-card">
+            <span>{{ $article->category ?: ($article->external_url ? 'Article externe' : 'Actualite') }}</span>
+            <h3>{{ $article->title }}</h3>
+            <p>{{ $article->excerpt ?: Str::limit(strip_tags($article->body), 130) }}</p>
+        </article>
+    @empty
+        <article class="feature-card">
+            <span>Tribune</span>
+            <h3>Parler sante des femmes en Guyane</h3>
+            <p>Regards croises sur les besoins, les freins d'acces et les leviers d'action.</p>
+        </article>
+        <article class="feature-card">
+            <span>Interview</span>
+            <h3>Voix de terrain</h3>
+            <p>Professionnels et partenaires partagent leurs experiences de prevention.</p>
+        </article>
+        <article class="feature-card">
+            <span>Publication</span>
+            <h3>Nouvelles ressources</h3>
+            <p>Supports simples pour accompagner les grandes etapes de la vie des femmes.</p>
+        </article>
+    @endforelse
     <div class="section-action">
         <a class="btn secondary" href="{{ route('news') }}">Voir toutes les actualites</a>
     </div>
@@ -62,18 +70,25 @@
         <p class="eyebrow">Agenda</p>
         <h2>Les prochains evenements</h2>
     </div>
-    <article>
-        <time>Sept.</time>
-        <div><h2>Les Jeudis M</h2><p>Rencontre thematique autour de la menopause et de la qualite de vie.</p></div>
-    </article>
-    <article>
-        <time>Oct.</time>
-        <div><h2>Prevention HPV</h2><p>Temps d'information, vaccination et ressources pour les familles.</p></div>
-    </article>
-    <article>
-        <time>Nov.</time>
-        <div><h2>Assises Amazoniennes</h2><p>Echanges entre acteurs de sante, chercheurs, institutions et associations.</p></div>
-    </article>
+    @forelse ($upcomingEvents as $event)
+        <article>
+            <time>{{ $event->event_date ? $event->event_date->translatedFormat('d M') : 'A venir' }}</time>
+            <div><h2>{{ $event->title }}</h2><p>{{ $event->description }}</p></div>
+        </article>
+    @empty
+        <article>
+            <time>Sept.</time>
+            <div><h2>Les Jeudis M</h2><p>Rencontre thematique autour de la menopause et de la qualite de vie.</p></div>
+        </article>
+        <article>
+            <time>Oct.</time>
+            <div><h2>Prevention HPV</h2><p>Temps d'information, vaccination et ressources pour les familles.</p></div>
+        </article>
+        <article>
+            <time>Nov.</time>
+            <div><h2>Assises Amazoniennes</h2><p>Echanges entre acteurs de sante, chercheurs, institutions et associations.</p></div>
+        </article>
+    @endforelse
     <div class="section-action">
         <a class="btn secondary" href="{{ route('agenda') }}">Voir tout l'agenda</a>
     </div>

@@ -31,7 +31,7 @@
                         <svg aria-hidden="true" viewBox="0 0 24 24">
                             <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.2 0-7 2.1-7 4.2V20h14v-1.8c0-2.1-2.8-4.2-7-4.2Z"/>
                         </svg>
-                        <span>Creer un compte</span>
+                        <span>Espace pro</span>
                     </button>
                 @endauth
                 <a class="nav-join" href="{{ route('join') }}">Nous soutenir</a>
@@ -45,12 +45,20 @@
                 <a href="{{ route('about') }}" @class(['active' => request()->routeIs('about')])>L'association</a>
                 <a href="{{ route('actions') }}" @class(['active' => request()->routeIs('actions')])>Nos actions</a>
                 <a href="{{ route('public') }}" @class(['active' => request()->routeIs('public')])>Sante des femmes</a>
-                <a href="{{ route('pro') }}" @class(['active' => request()->routeIs('pro')])>Espace pro</a>
                 <a href="{{ route('news') }}" @class(['active' => request()->routeIs('news')])>Actualites</a>
                 <a href="{{ route('agenda') }}" @class(['active' => request()->routeIs('agenda')])>Agenda</a>
                 <a href="{{ route('research') }}" @class(['active' => request()->routeIs('research')])>Recherche</a>
                 <a href="{{ route('contact') }}" @class(['active' => request()->routeIs('contact')])>Contact</a>
             </nav>
+            <div class="site-search" data-site-search>
+                <label for="site-search-input" aria-label="Rechercher sur le site">
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="M10.8 4a6.8 6.8 0 1 1-4.81 11.61A6.8 6.8 0 0 1 10.8 4Zm0 2a4.8 4.8 0 1 0 3.39 8.19A4.8 4.8 0 0 0 10.8 6Zm5.66 9.04 3.25 3.25-1.42 1.42-3.25-3.25 1.42-1.42Z"/>
+                    </svg>
+                    <input id="site-search-input" type="search" placeholder="Rechercher" autocomplete="off" data-search-input data-search-url="{{ route('search') }}">
+                </label>
+                <div class="search-results" data-search-results hidden></div>
+            </div>
         </div>
     </header>
 
@@ -59,43 +67,59 @@
             <button class="modal-close" type="button" data-close-register aria-label="Fermer la fenetre">&times;</button>
             <div class="modal-heading">
                 <p class="eyebrow">Compte professionnel</p>
-                <h2 id="register-modal-title">Creer un compte</h2>
-                <p>Choisissez une inscription rapide avec Google ou creez votre acces professionnel avec un email.</p>
+                <h2 id="register-modal-title">Espace pro</h2>
+                <p>Connectez-vous a votre compte professionnel ou creez un acces avec votre email.</p>
             </div>
 
-            <button class="google-auth-button" type="button" disabled>
-                <span>G</span>
-                Continuer avec Google
-                <small>Configuration OAuth requise</small>
-            </button>
+            <div class="pro-auth-modal-grid">
+                <form class="auth-card modal-login-form" method="POST" action="{{ route('professional.login') }}">
+                    @csrf
+                    <h3>Connexion</h3>
+                    <label for="modal-login-email">Email</label>
+                    <input id="modal-login-email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
 
-            <div class="modal-separator"><span>ou par email</span></div>
+                    <label for="modal-login-password">Mot de passe</label>
+                    <input id="modal-login-password" name="password" type="password" autocomplete="current-password" required>
 
-            <form class="auth-card modal-register-form" method="POST" action="{{ route('professional.register') }}">
-                @csrf
-                <label for="modal-register-name">Nom complet</label>
-                <input id="modal-register-name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required>
-                @error('name', 'register')
-                    <p class="form-error">{{ $message }}</p>
-                @enderror
+                    <label class="check-row">
+                        <input name="remember" type="checkbox" value="1">
+                        <span>Rester connecte</span>
+                    </label>
 
-                <label for="modal-register-email">Email professionnel</label>
-                <input id="modal-register-email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
-                @error('email', 'register')
-                    <p class="form-error">{{ $message }}</p>
-                @enderror
+                    @error('email')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
 
-                <label for="modal-register-password">Mot de passe</label>
-                <input id="modal-register-password" name="password" type="password" autocomplete="new-password" required>
-                @error('password', 'register')
-                    <p class="form-error">{{ $message }}</p>
-                @enderror
+                    <button type="submit">Se connecter</button>
+                </form>
 
-                <label for="modal-register-password-confirmation">Confirmer le mot de passe</label>
-                <input id="modal-register-password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+                <form class="auth-card modal-register-form accent-card" method="POST" action="{{ route('professional.register') }}">
+                    @csrf
+                    <h3>Inscription</h3>
+                    <label for="modal-register-name">Nom complet</label>
+                    <input id="modal-register-name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required>
+                    @error('name', 'register')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
 
-                <button type="submit">Creer mon acces</button>
-            </form>
+                    <label for="modal-register-email">Email professionnel</label>
+                    <input id="modal-register-email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required>
+                    @error('email', 'register')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
+
+                    <label for="modal-register-password">Mot de passe</label>
+                    <input id="modal-register-password" name="password" type="password" autocomplete="new-password" required>
+                    @error('password', 'register')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
+
+                    <label for="modal-register-password-confirmation">Confirmer le mot de passe</label>
+                    <input id="modal-register-password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+
+                    <button type="submit">Creer mon acces</button>
+                </form>
+            </div>
         </dialog>
     @endguest
 
