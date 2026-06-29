@@ -169,6 +169,11 @@ class AdminAuthTest extends TestCase
         $this->assertTrue($event->flyer_is_image);
         $this->assertSame('PNG', $event->flyer_extension);
         Storage::disk('public')->assertExists($event->image_path);
+
+        $this->get(route('agenda'))
+            ->assertOk()
+            ->assertSee('event-flyer-frame')
+            ->assertSee('/storage/events/flyers/', false);
     }
 
     public function test_public_agenda_links_to_non_image_event_flyer(): void

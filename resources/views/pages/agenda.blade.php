@@ -38,9 +38,14 @@
                 <div class="event-visual">
                     @if ($event->image_path)
                         @if ($event->flyer_is_image)
-                            <a href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer" aria-label="Voir le flyer de {{ $event->title }}">
+                            <a class="event-flyer-frame" href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer" aria-label="Voir le flyer de {{ $event->title }}">
                                 <img src="{{ Storage::url($event->image_path) }}" alt="Flyer {{ $event->title }}">
                             </a>
+                        @elseif ($event->flyer_extension === 'PDF')
+                            <div class="event-flyer-frame event-pdf-frame">
+                                <iframe src="{{ Storage::url($event->image_path) }}" title="Flyer {{ $event->title }}"></iframe>
+                                <a href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer">Ouvrir le flyer</a>
+                            </div>
                         @else
                             <a class="event-file-link" href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noreferrer">
                                 <span>{{ $event->flyer_extension }}</span>
