@@ -850,9 +850,9 @@ h3 {
 
 .admin-overview {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 1px;
-    padding: clamp(34px, 5vw, 58px) clamp(20px, 5vw, 76px) 0;
+    padding: 0 0 24px;
 }
 
 .admin-overview article {
@@ -866,6 +866,14 @@ h3 {
     background: var(--coral-dark);
 }
 
+.admin-overview .maintenance-off {
+    background: #2b00c9;
+}
+
+.admin-overview .maintenance-on {
+    background: #8b123f;
+}
+
 .admin-overview span {
     display: block;
     font-family: Georgia, 'Times New Roman', serif;
@@ -874,7 +882,7 @@ h3 {
 }
 
 .admin-section {
-    padding: clamp(48px, 7vw, 80px) clamp(20px, 5vw, 76px);
+    padding: clamp(38px, 6vw, 70px) 0;
     border-bottom: 1px solid var(--line);
 }
 
@@ -898,6 +906,91 @@ h3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 18px;
+}
+
+.cms-shell {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: clamp(22px, 4vw, 42px);
+    align-items: start;
+    padding: clamp(34px, 5vw, 58px) clamp(20px, 5vw, 76px) clamp(48px, 7vw, 90px);
+}
+
+.cms-sidebar {
+    position: sticky;
+    top: 150px;
+    display: grid;
+    gap: 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 16px 40px rgba(20, 50, 56, 0.08);
+}
+
+.cms-sidebar strong {
+    margin-bottom: 8px;
+    color: var(--deep-teal);
+}
+
+.cms-sidebar a {
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.cms-sidebar a:hover {
+    color: var(--deep-teal);
+    background: var(--mint);
+}
+
+.cms-main {
+    min-width: 0;
+}
+
+.cms-config {
+    padding-top: 24px;
+}
+
+.settings-form {
+    grid-template-columns: minmax(240px, 0.65fr) minmax(280px, 1fr);
+}
+
+.settings-form label {
+    display: grid;
+    gap: 8px;
+    color: var(--ink);
+    font-weight: 850;
+}
+
+.settings-form button {
+    grid-column: 1 / -1;
+    justify-self: start;
+}
+
+.maintenance-toggle {
+    grid-row: span 2;
+    align-content: start;
+    border: 1px solid rgba(198, 43, 200, 0.22);
+    border-radius: 8px;
+    padding: 18px;
+    background: var(--mint);
+}
+
+.maintenance-toggle input {
+    width: 22px;
+    height: 22px;
+}
+
+.maintenance-toggle span {
+    display: grid;
+    gap: 6px;
+}
+
+.maintenance-toggle small {
+    color: var(--muted);
+    font-weight: 700;
 }
 
 .admin-form textarea,
@@ -1008,6 +1101,35 @@ h3 {
     margin: 0;
     color: var(--muted);
     font-weight: 800;
+}
+
+.maintenance-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        linear-gradient(110deg, rgba(251, 244, 255, 0.94), rgba(255, 255, 255, 0.9)),
+        repeating-linear-gradient(135deg, rgba(58, 0, 245, 0.08) 0 1px, transparent 1px 18px);
+}
+
+.maintenance-card {
+    width: min(680px, 100%);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(28px, 6vw, 58px);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: var(--shadow);
+}
+
+.maintenance-card img {
+    width: min(320px, 100%);
+    height: auto;
+    margin-bottom: 28px;
+}
+
+.maintenance-card h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
 }
 
 .statement {
@@ -1193,9 +1315,19 @@ h3 {
     .stats-band,
     .contact-layout,
     .admin-overview,
+    .cms-shell,
     .admin-form,
+    .settings-form,
     .admin-list article > form:first-child {
         grid-template-columns: 1fr;
+    }
+
+    .cms-sidebar {
+        position: static;
+    }
+
+    .settings-form button {
+        grid-column: 1;
     }
 
     .admin-table article {

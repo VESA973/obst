@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Member;
 use App\Models\ResourceFile;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,7 +23,27 @@ class AdminController extends Controller
             'files' => ResourceFile::latest()->get(),
             'events' => Event::orderByRaw('event_date IS NULL')->orderBy('event_date')->get(),
             'users' => User::orderByDesc('is_admin')->orderBy('name')->get(),
+            'settings' => [
+                'maintenance_enabled' => SiteSetting::getValue('maintenance_enabled', '0'),
+                'maintenance_message' => SiteSetting::getValue('maintenance_message', 'Le site est temporairement en maintenance. Merci de revenir dans quelques instants.'),
+                'admin_note' => SiteSetting::getValue('admin_note', ''),
+            ],
         ]);
+    }
+
+    public function updateSettings(Request $request): RedirectResponse
+    {
+        $attributes = $request->validate([
+            'maintenance_enabled' => ['nullable', 'boolean'],
+            'maintenance_message' => ['required', 'string', 'max:500'],
+            'admin_note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        SiteSetting::setValue('maintenance_enabled', $request->boolean('maintenance_enabled') ? '1' : '0');
+        SiteSetting::setValue('maintenance_message', $attributes['maintenance_message']);
+        SiteSetting::setValue('admin_note', $attributes['admin_note'] ?? '');
+
+        return back()->with('status', 'Configuration du site mise a jour.');
     }
 
     public function storeMember(Request $request): RedirectResponse

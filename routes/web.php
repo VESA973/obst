@@ -36,6 +36,7 @@ Route::get('/admin/initialiser', function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+    Route::put('/configuration', [AdminController::class, 'updateSettings'])->name('settings.update');
     Route::post('/membres', [AdminController::class, 'storeMember'])->name('members.store');
     Route::put('/membres/{member}', [AdminController::class, 'updateMember'])->name('members.update');
     Route::delete('/membres/{member}', [AdminController::class, 'destroyMember'])->name('members.destroy');
