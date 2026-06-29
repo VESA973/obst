@@ -433,7 +433,7 @@
                 <input name="registration_capacity" type="number" min="1" placeholder="Places gratuites">
                 <label>
                     Flyer principal
-                    <input name="image" type="file">
+                    <input name="image" type="file" accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,image/*,application/pdf">
                 </label>
                 <div class="schedule-fields">
                     <strong>Dates et horaires</strong>
@@ -514,7 +514,7 @@
                             <input name="registration_capacity" type="number" min="1" value="{{ $event->registration_capacity }}" placeholder="Places gratuites">
                             <label>
                                 Remplacer le flyer principal
-                                <input name="image" type="file">
+                                <input name="image" type="file" accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.pdf,.doc,.docx,.ppt,.pptx,image/*,application/pdf">
                             </label>
                             <div class="schedule-fields">
                                 <strong>Dates et horaires</strong>

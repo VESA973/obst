@@ -148,6 +148,29 @@ class AdminAuthTest extends TestCase
         $this->assertStringEndsWith('.pdf', $event->image_path);
     }
 
+    public function test_admin_can_use_png_as_event_main_flyer(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.events.store'), [
+                'title' => 'Evenement flyer PNG',
+                'event_date' => now()->addWeek()->toDateString(),
+                'image' => new UploadedFile(public_path('images/quinzaine-hero.png'), 'flyer-evenement.png', 'image/png', null, true),
+                'is_published' => '1',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $event = Event::where('title', 'Evenement flyer PNG')->firstOrFail();
+
+        $this->assertTrue($event->flyer_is_image);
+        $this->assertSame('PNG', $event->flyer_extension);
+        Storage::disk('public')->assertExists($event->image_path);
+    }
+
     public function test_public_agenda_links_to_non_image_event_flyer(): void
     {
         Storage::fake('public');
