@@ -3,11 +3,7 @@
 @section('title', 'Sante des femmes | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero public-hero">
-    <p class="eyebrow">Sante des femmes</p>
-    <h1>Des fiches simples classees par theme</h1>
-    <p>Des reperes accessibles pour comprendre les grandes etapes de la vie, identifier les sujets a discuter avec un professionnel et trouver les bons relais.</p>
-</section>
+<x-page-hero page-key="public" class="public-hero" />
 
 <section class="resource-grid">
     <article><span>Cycle de vie</span><h2>Puberte</h2><p>Comprendre les changements du corps, les regles, l'hygiene et les premiers repaires de sante.</p></article>

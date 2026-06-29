@@ -8,6 +8,7 @@ use App\Models\ArticleCategory;
 use App\Models\Event;
 use App\Models\EventAsset;
 use App\Models\Member;
+use App\Models\PageSetting;
 use App\Models\ResourceFile;
 use App\Models\SiteSetting;
 use App\Models\User;
@@ -23,12 +24,70 @@ class AdminController extends Controller
 {
     public function index(): View
     {
+        return $this->dashboardView('dashboard');
+    }
+
+    public function configuration(): View
+    {
+        return $this->dashboardView('configuration');
+    }
+
+    public function pages(): View
+    {
+        return $this->dashboardView('pages');
+    }
+
+    public function articles(Request $request): View
+    {
+        return $this->dashboardView('actualites', $request);
+    }
+
+    public function members(): View
+    {
+        return $this->dashboardView('membres');
+    }
+
+    public function files(): View
+    {
+        return $this->dashboardView('fichiers');
+    }
+
+    public function events(Request $request): View
+    {
+        return $this->dashboardView('agenda', $request);
+    }
+
+    public function users(): View
+    {
+        return $this->dashboardView('utilisateurs');
+    }
+
+    private function dashboardView(string $activeSection, ?Request $request = null): View
+    {
+        $request ??= request();
+        $articlePerPage = (int) $request->integer('articles_per_page', 10);
+        $articlePerPage = in_array($articlePerPage, [10, 20, 50], true) ? $articlePerPage : 10;
+        $articleQuery = Article::with(['assets', 'categoryModel'])->latest('published_at')->latest();
+        $eventPerPage = (int) $request->integer('events_per_page', 10);
+        $eventPerPage = in_array($eventPerPage, [10, 20, 50], true) ? $eventPerPage : 10;
+        $eventQuery = Event::with(['registrations', 'assets'])->orderByRaw('event_date IS NULL')->orderBy('event_date');
+
         return view('admin.dashboard', [
+            'activeSection' => $activeSection,
             'articleCategories' => ArticleCategory::withCount('articles')->orderBy('name')->get(),
-            'articles' => Article::with(['assets', 'categoryModel'])->latest('published_at')->latest()->get(),
+            'pageSettings' => PageSetting::allConfigured(),
+            'articlePerPage' => $articlePerPage,
+            'articleTotal' => Article::count(),
+            'articles' => $activeSection === 'actualites'
+                ? $articleQuery->paginate($articlePerPage)->withQueryString()
+                : $articleQuery->get(),
             'members' => Member::latest()->get(),
             'files' => ResourceFile::latest()->get(),
-            'events' => Event::with(['registrations', 'assets'])->orderByRaw('event_date IS NULL')->orderBy('event_date')->get(),
+            'eventPerPage' => $eventPerPage,
+            'eventTotal' => Event::count(),
+            'events' => $activeSection === 'agenda'
+                ? $eventQuery->paginate($eventPerPage)->withQueryString()
+                : $eventQuery->get(),
             'users' => User::orderByDesc('is_admin')->orderBy('name')->get(),
             'settings' => [
                 'maintenance_enabled' => SiteSetting::getValue('maintenance_enabled', '0'),
@@ -51,6 +110,41 @@ class AdminController extends Controller
         SiteSetting::setValue('admin_note', $attributes['admin_note'] ?? '');
 
         return back()->with('status', 'Configuration du site mise a jour.');
+    }
+
+    public function updatePages(Request $request): RedirectResponse
+    {
+        $attributes = $request->validate([
+            'pages' => ['required', 'array'],
+            'pages.*.menu_label' => ['required', 'string', 'max:80'],
+            'pages.*.eyebrow' => ['nullable', 'string', 'max:120'],
+            'pages.*.title' => ['required', 'string', 'max:180'],
+            'pages.*.description' => ['nullable', 'string', 'max:600'],
+            'pages.*.title_size' => ['required', Rule::in(['small', 'normal', 'large'])],
+            'pages.*.show_in_menu' => ['nullable', 'boolean'],
+            'hero_images' => ['nullable', 'array'],
+            'hero_images.*' => ['nullable', 'image', 'max:4096'],
+        ]);
+
+        foreach ($attributes['pages'] as $pageKey => $pageAttributes) {
+            abort_unless(array_key_exists($pageKey, PageSetting::defaults()), 404);
+
+            $pageSetting = PageSetting::firstOrNew(['page_key' => $pageKey]);
+
+            if ($request->hasFile("hero_images.{$pageKey}")) {
+                if ($pageSetting->hero_image_path) {
+                    Storage::disk('public')->delete($pageSetting->hero_image_path);
+                }
+
+                $pageAttributes['hero_image_path'] = $request->file("hero_images.{$pageKey}")->store('pages/headers', 'public');
+            }
+
+            $pageAttributes['show_in_menu'] = $request->boolean("pages.{$pageKey}.show_in_menu");
+            $pageSetting->fill($pageAttributes);
+            $pageSetting->save();
+        }
+
+        return back()->with('status', 'Configuration des pages mise a jour.');
     }
 
     public function storeMember(Request $request): RedirectResponse

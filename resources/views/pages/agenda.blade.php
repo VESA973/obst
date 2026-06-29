@@ -3,11 +3,7 @@
 @section('title', 'Agenda | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero compact">
-    <p class="eyebrow">Agenda</p>
-    <h1>Les rendez-vous de la Quinzaine</h1>
-    <p>Toutes les manifestations avec inscription en ligne : conferences, ateliers, rencontres professionnelles et temps d'echange ouverts au public.</p>
-</section>
+<x-page-hero page-key="agenda" />
 
 <section class="agenda-list">
     @forelse ($events as $event)

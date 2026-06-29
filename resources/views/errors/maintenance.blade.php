@@ -13,7 +13,6 @@
             <p class="eyebrow">Maintenance</p>
             <h1>Le site revient bientot</h1>
             <p>{{ $message }}</p>
-            <a class="btn secondary" href="{{ route('pro') }}">Acces equipe</a>
         </section>
     </main>
 </body>

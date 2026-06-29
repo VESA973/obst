@@ -3,11 +3,7 @@
 @section('title', 'L association | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero compact association-hero">
-    <p class="eyebrow">L'association</p>
-    <h1>Qui sommes-nous ?</h1>
-    <p>La Quinzaine Obstetricale est une association engagee dans la promotion de la sante des femmes, de la perinatalite et de la formation des professionnels de sante en Guyane.</p>
-</section>
+<x-page-hero page-key="about" class="compact association-hero" />
 
 <section class="association-intro">
     <div class="association-years">

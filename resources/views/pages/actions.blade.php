@@ -3,11 +3,7 @@
 @section('title', 'Nos actions | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero compact">
-    <p class="eyebrow">Nos actions</p>
-    <h1>Des projets concrets pour informer, former, innover et agir</h1>
-    <p>Chaque action repond a un besoin du territoire : prevention, formation, dialogue public, ressources professionnelles et innovation en sante.</p>
-</section>
+<x-page-hero page-key="actions" />
 
 <section class="resource-grid action-grid">
     <article><span>Rencontre</span><h2>Assises Amazoniennes</h2><p>Un temps fort pour croiser les regards des acteurs de sante, chercheurs, institutions et associations.</p></article>

@@ -3,11 +3,7 @@
 @section('title', 'Contact | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero compact">
-    <p class="eyebrow">Contact</p>
-    <h1>Entrer en contact avec l'association</h1>
-    <p>Une question, une proposition de partenariat, une inscription ou une demande d'information : contactez-nous directement.</p>
-</section>
+<x-page-hero page-key="contact" />
 
 <section class="contact-layout">
     <form class="auth-card contact-form" action="mailto:contact@quinzaine-obstetricale.test" method="GET">

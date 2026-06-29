@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
         ]);
+        $middleware->redirectGuestsTo(function ($request): string {
+            return $request->is('admin') || $request->is('admin/*')
+                ? route('admin.login')
+                : route('login');
+        });
         $middleware->web(append: [
             CheckSiteMaintenance::class,
         ]);

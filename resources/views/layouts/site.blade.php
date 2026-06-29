@@ -17,11 +17,6 @@
             <div class="header-actions" aria-label="Actions rapides">
                 @auth
                     <span class="account-chip">{{ auth()->user()->name }}</span>
-                    @if (auth()->user()->is_admin)
-                        <a href="{{ route('admin.dashboard') }}">Admin</a>
-                    @elseif (! \App\Models\User::where('is_admin', true)->exists())
-                        <a href="{{ route('admin.bootstrap') }}">Initialiser admin</a>
-                    @endif
                     <form method="POST" action="{{ route('professional.logout') }}">
                         @csrf
                         <button type="submit">Deconnexion</button>
@@ -42,13 +37,9 @@
             <span class="header-note">Sante des femmes et perinatalite en Guyane</span>
             <nav class="main-nav" aria-label="Navigation principale">
                 <a href="{{ route('home') }}" @class(['active' => request()->routeIs('home')])>Accueil</a>
-                <a href="{{ route('about') }}" @class(['active' => request()->routeIs('about')])>L'association</a>
-                <a href="{{ route('actions') }}" @class(['active' => request()->routeIs('actions')])>Nos actions</a>
-                <a href="{{ route('public') }}" @class(['active' => request()->routeIs('public')])>Sante des femmes</a>
-                <a href="{{ route('news') }}" @class(['active' => request()->routeIs('news')])>Actualites</a>
-                <a href="{{ route('agenda') }}" @class(['active' => request()->routeIs('agenda')])>Agenda</a>
-                <a href="{{ route('research') }}" @class(['active' => request()->routeIs('research')])>Recherche</a>
-                <a href="{{ route('contact') }}" @class(['active' => request()->routeIs('contact')])>Contact</a>
+                @foreach ($siteMenuPages as $menuPage)
+                    <a href="{{ route($menuPage['route']) }}" @class(['active' => request()->routeIs($menuPage['route'])])>{{ $menuPage['menu_label'] }}</a>
+                @endforeach
             </nav>
             <div class="site-search" data-site-search>
                 <label for="site-search-input" aria-label="Rechercher sur le site">

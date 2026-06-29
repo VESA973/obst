@@ -3,11 +3,7 @@
 @section('title', 'Recherche et Innovation | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero compact">
-    <p class="eyebrow">Recherche & Innovation</p>
-    <h1>Developper les connaissances et les solutions utiles au territoire</h1>
-    <p>La recherche et l'innovation accompagnent les actions de prevention, les pratiques professionnelles et les collaborations autour de la sante des femmes.</p>
-</section>
+<x-page-hero page-key="research" />
 
 <section class="resource-grid">
     <article><span>Recherche</span><h2>Projets en cours</h2><p>Travaux suivis par l'association et projets en developpement avec les partenaires.</p></article>

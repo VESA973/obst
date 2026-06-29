@@ -37,11 +37,7 @@ class CheckSiteMaintenance
     {
         return $request->is(
             'admin',
-            'admin/*',
-            'connexion',
-            'espace-pro',
-            'professionnels/connexion',
-            'professionnels/deconnexion'
+            'admin/*'
         );
     }
 }

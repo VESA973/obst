@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Article;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -113,5 +114,32 @@ class ArticlePublishingTest extends TestCase
         $this->get(route('articles.show', 'article-categorie'))
             ->assertOk()
             ->assertSee('Prevention');
+    }
+
+    public function test_admin_can_choose_how_many_articles_are_listed(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        foreach (range(1, 12) as $index) {
+            Article::create([
+                'title' => sprintf('Article pagination %02d', $index),
+                'slug' => sprintf('article-pagination-%02d', $index),
+                'published_at' => now()->addMinutes($index),
+                'is_published' => true,
+            ]);
+        }
+
+        $this->actingAs($admin)
+            ->get(route('admin.articles.index'))
+            ->assertOk()
+            ->assertSee('12 actualite(s)')
+            ->assertSee('Article pagination 12')
+            ->assertSee('Article pagination 03')
+            ->assertDontSee('Article pagination 02');
+
+        $this->actingAs($admin)
+            ->get(route('admin.articles.index', ['articles_per_page' => 20]))
+            ->assertOk()
+            ->assertSee('Article pagination 02');
     }
 }

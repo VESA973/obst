@@ -3,11 +3,7 @@
 @section('title', 'Actualites | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero compact">
-    <p class="eyebrow">Actualites</p>
-    <h1>Articles, tribunes, interviews et publications</h1>
-    <p>Un espace pour suivre les prises de parole, les communiques, les publications scientifiques et les nouvelles ressources de l'association.</p>
-</section>
+<x-page-hero page-key="news" />
 
 <section class="resource-grid news-grid">
     @forelse ($articles as $article)

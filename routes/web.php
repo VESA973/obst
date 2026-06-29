@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\EventQrCodeController;
 use App\Http\Controllers\EventRegistrationController;
 use App\Http\Controllers\PageController;
@@ -32,20 +33,31 @@ Route::post('/professionnels/inscription', [ProfessionalAuthController::class, '
 Route::post('/professionnels/connexion', [ProfessionalAuthController::class, 'login'])->name('professional.login');
 Route::post('/professionnels/deconnexion', [ProfessionalAuthController::class, 'logout'])->name('professional.logout');
 
+Route::get('/admin', [AdminAuthController::class, 'loginForm'])->name('admin.dashboard');
+Route::get('/admin/connexion', [AdminAuthController::class, 'loginForm'])->name('admin.login');
+Route::post('/admin/connexion', [AdminAuthController::class, 'login'])->name('admin.login.store');
+Route::post('/admin/deconnexion', [AdminAuthController::class, 'logout'])->middleware('auth')->name('admin.logout');
+
 Route::get('/admin/initialiser', function () {
     abort_if(User::where('is_admin', true)->exists(), 403);
 
     auth()->user()->forceFill(['is_admin' => true])->save();
 
-    return redirect()->route('admin.dashboard')->with('status', 'Votre compte est maintenant administrateur.');
+    return redirect()->route('admin.home')->with('status', 'Votre compte est maintenant administrateur.');
 })->middleware('auth')->name('admin.bootstrap');
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/tableau-de-bord', [AdminController::class, 'index'])->name('home');
+    Route::get('/configuration', [AdminController::class, 'configuration'])->name('configuration');
     Route::put('/configuration', [AdminController::class, 'updateSettings'])->name('settings.update');
+    Route::get('/pages', [AdminController::class, 'pages'])->name('pages.index');
+    Route::put('/pages', [AdminController::class, 'updatePages'])->name('pages.update');
+    Route::get('/actualites', [AdminController::class, 'articles'])->name('articles.index');
+    Route::get('/membres', [AdminController::class, 'members'])->name('members.index');
     Route::post('/membres', [AdminController::class, 'storeMember'])->name('members.store');
     Route::put('/membres/{member}', [AdminController::class, 'updateMember'])->name('members.update');
     Route::delete('/membres/{member}', [AdminController::class, 'destroyMember'])->name('members.destroy');
+    Route::get('/fichiers', [AdminController::class, 'files'])->name('files.index');
     Route::post('/fichiers', [AdminController::class, 'storeFile'])->name('files.store');
     Route::delete('/fichiers/{file}', [AdminController::class, 'destroyFile'])->name('files.destroy');
     Route::post('/actualites/categories', [AdminController::class, 'storeArticleCategory'])->name('article-categories.store');
@@ -54,10 +66,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/actualites/{article}', [AdminController::class, 'updateArticle'])->name('articles.update');
     Route::delete('/actualites/{article}', [AdminController::class, 'destroyArticle'])->name('articles.destroy');
     Route::delete('/actualites/photos/{asset}', [AdminController::class, 'destroyArticleAsset'])->name('articles.assets.destroy');
+    Route::get('/evenements', [AdminController::class, 'events'])->name('events.index');
     Route::post('/evenements', [AdminController::class, 'storeEvent'])->name('events.store');
     Route::put('/evenements/{event}', [AdminController::class, 'updateEvent'])->name('events.update');
     Route::delete('/evenements/{event}', [AdminController::class, 'destroyEvent'])->name('events.destroy');
     Route::delete('/evenements/fichiers/{asset}', [AdminController::class, 'destroyEventAsset'])->name('events.assets.destroy');
+    Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users.index');
     Route::post('/utilisateurs', [AdminController::class, 'storeUser'])->name('users.store');
     Route::put('/utilisateurs/{user}', [AdminController::class, 'updateUser'])->name('users.update');
     Route::delete('/utilisateurs/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');

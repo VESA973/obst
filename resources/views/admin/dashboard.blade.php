@@ -1,40 +1,79 @@
-@extends('layouts.site')
+@extends('layouts.admin')
 
 @section('title', 'Administration CMS | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero compact admin-hero">
-    <p class="eyebrow">Administration CMS</p>
-    <h1>Piloter le site</h1>
-    <p>Un espace reserve pour gerer les contenus, les membres, les fichiers, l'agenda, les utilisateurs et la configuration generale du site.</p>
+@php
+    $activeSection = $activeSection ?? 'dashboard';
+@endphp
+
+<section class="admin-topbar">
+    <div>
+        <span>Administration</span>
+        <strong>La Quinzaine Obstetricale</strong>
+    </div>
+    <nav aria-label="Actions administration">
+        <a href="{{ route('home') }}">Voir le site</a>
+        <form method="POST" action="{{ route('admin.logout') }}">
+            @csrf
+            <button type="submit">Deconnexion</button>
+        </form>
+    </nav>
 </section>
 
 <section class="cms-shell">
     <aside class="cms-sidebar" aria-label="Navigation administration">
-        <strong>Administration</strong>
-        <a href="#configuration">Configuration</a>
-        <a href="#actualites">Actualites</a>
-        <a href="#membres">Membres</a>
-        <a href="#fichiers">Fichiers</a>
-        <a href="#agenda">Agenda</a>
-        <a href="#utilisateurs">Utilisateurs</a>
-        <a href="{{ route('home') }}">Voir le site</a>
+        <strong>Admin</strong>
+        <a href="{{ route('admin.home') }}" @class(['active' => $activeSection === 'dashboard'])><span>00</span> Tableau de bord</a>
+        <a href="{{ route('admin.configuration') }}" @class(['active' => $activeSection === 'configuration'])><span>01</span> Configuration</a>
+        <a href="{{ route('admin.pages.index') }}" @class(['active' => $activeSection === 'pages'])><span>02</span> Pages</a>
+        <a href="{{ route('admin.articles.index') }}" @class(['active' => $activeSection === 'actualites'])><span>03</span> Actualites</a>
+        <a href="{{ route('admin.members.index') }}" @class(['active' => $activeSection === 'membres'])><span>04</span> Membres</a>
+        <a href="{{ route('admin.files.index') }}" @class(['active' => $activeSection === 'fichiers'])><span>05</span> Fichiers</a>
+        <a href="{{ route('admin.events.index') }}" @class(['active' => $activeSection === 'agenda'])><span>06</span> Agenda</a>
+        <a href="{{ route('admin.users.index') }}" @class(['active' => $activeSection === 'utilisateurs'])><span>07</span> Utilisateurs</a>
+        <a href="{{ route('home') }}"><span>↗</span> Voir le site</a>
+        <form class="admin-sidebar-logout" method="POST" action="{{ route('admin.logout') }}">
+            @csrf
+            <button type="submit">Deconnexion</button>
+        </form>
     </aside>
 
     <div class="cms-main">
+        <div class="admin-console-head">
+            <div>
+                <p class="eyebrow">Console</p>
+                <h2>Modules du site</h2>
+            </div>
+            <a class="admin-site-link" href="{{ route('home') }}">Ouvrir le site</a>
+        </div>
+
+        @if ($activeSection === 'dashboard')
         <section class="admin-overview">
             <article class="{{ $settings['maintenance_enabled'] === '1' ? 'maintenance-on' : 'maintenance-off' }}">
                 <span>{{ $settings['maintenance_enabled'] === '1' ? 'ON' : 'OK' }}</span>
                 <strong>{{ $settings['maintenance_enabled'] === '1' ? 'Maintenance' : 'Site en ligne' }}</strong>
             </article>
-            <article><span>{{ $articles->count() }}</span><strong>Actualites</strong></article>
+            <article><span>{{ $articleTotal }}</span><strong>Actualites</strong></article>
             <article><span>{{ $members->count() }}</span><strong>Membres</strong></article>
             <article><span>{{ $files->count() }}</span><strong>Fichiers</strong></article>
-            <article><span>{{ $events->count() }}</span><strong>Evenements</strong></article>
+            <article><span>{{ $eventTotal }}</span><strong>Evenements</strong></article>
             <article><span>{{ $users->where('is_admin', true)->count() }}</span><strong>Admins</strong></article>
         </section>
 
-        <section class="admin-section cms-config" id="configuration">
+        <section class="module-grid" aria-label="Modules administration">
+            <a href="{{ route('admin.configuration') }}"><strong>Configuration</strong><span>Maintenance, note interne</span></a>
+            <a href="{{ route('admin.pages.index') }}"><strong>Pages</strong><span>Menus, entetes, images</span></a>
+            <a href="{{ route('admin.articles.index') }}"><strong>Actualites</strong><span>Articles, categories, photos</span></a>
+            <a href="{{ route('admin.members.index') }}"><strong>Membres</strong><span>Contacts et statuts</span></a>
+            <a href="{{ route('admin.files.index') }}"><strong>Fichiers</strong><span>Ressources publiques et pro</span></a>
+            <a href="{{ route('admin.events.index') }}"><strong>Agenda</strong><span>Evenements, QR codes, inscriptions</span></a>
+            <a href="{{ route('admin.users.index') }}"><strong>Utilisateurs</strong><span>Admins et comptes membres</span></a>
+        </section>
+        @endif
+
+        @if ($activeSection === 'configuration')
+        <section class="admin-section admin-module cms-config" id="configuration">
             <div class="admin-section-heading">
                 <p class="eyebrow">Configuration</p>
                 <h2>Reglages generaux du site</h2>
@@ -62,8 +101,67 @@
                 <button type="submit">Enregistrer la configuration</button>
             </form>
         </section>
+        @endif
 
-        <section class="admin-section" id="actualites">
+        @if ($activeSection === 'pages')
+        <section class="admin-section admin-module" id="pages">
+            <div class="admin-section-heading">
+                <p class="eyebrow">Pages</p>
+                <h2>Configurer les entetes et le menu</h2>
+                <p>Modifiez le libelle du menu, le titre affiche en haut de page, l'image d'entete et la taille du texte.</p>
+            </div>
+
+            <form class="admin-page-settings" method="POST" action="{{ route('admin.pages.update') }}" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                @foreach ($pageSettings as $pageKey => $page)
+                    <details class="admin-event-item admin-page-item">
+                        <summary class="admin-event-summary admin-page-summary">
+                            <span class="admin-event-date">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                            <span>
+                                <strong>{{ $page['menu_label'] }}</strong>
+                                <small>{{ route($page['route']) }}</small>
+                            </span>
+                            <span class="admin-event-badges">
+                                <small>{{ $page['show_in_menu'] ? 'Menu visible' : 'Hors menu' }}</small>
+                                <small>{{ ucfirst($page['title_size']) }}</small>
+                                @if (! empty($page['hero_image_path']))
+                                    <small>Image</small>
+                                @endif
+                            </span>
+                            <span class="admin-event-edit">Configurer</span>
+                        </summary>
+                        <div class="admin-page-form">
+                            <input name="pages[{{ $pageKey }}][menu_label]" value="{{ $page['menu_label'] }}" placeholder="Nom dans le menu" required>
+                            <input name="pages[{{ $pageKey }}][eyebrow]" value="{{ $page['eyebrow'] }}" placeholder="Petit titre au-dessus">
+                            <input name="pages[{{ $pageKey }}][title]" value="{{ $page['title'] }}" placeholder="Titre de l'entete" required>
+                            <select name="pages[{{ $pageKey }}][title_size]">
+                                <option value="small" @selected($page['title_size'] === 'small')>Titre discret</option>
+                                <option value="normal" @selected($page['title_size'] === 'normal')>Titre normal</option>
+                                <option value="large" @selected($page['title_size'] === 'large')>Titre grand</option>
+                            </select>
+                            <label>
+                                Image d'entete
+                                <input name="hero_images[{{ $pageKey }}]" type="file" accept="image/*">
+                            </label>
+                            <textarea name="pages[{{ $pageKey }}][description]" placeholder="Description de l'entete">{{ $page['description'] }}</textarea>
+                            <label class="admin-check">
+                                <input name="pages[{{ $pageKey }}][show_in_menu]" type="checkbox" value="1" @checked($page['show_in_menu'])>
+                                Afficher dans le menu principal
+                            </label>
+                            @if (! empty($page['hero_image_path']))
+                                <a class="admin-current-image" href="{{ Storage::url($page['hero_image_path']) }}" target="_blank" rel="noreferrer">Voir l'image actuelle</a>
+                            @endif
+                        </div>
+                    </details>
+                @endforeach
+                <button type="submit">Enregistrer les pages</button>
+            </form>
+        </section>
+        @endif
+
+        @if ($activeSection === 'actualites')
+        <section class="admin-section admin-module" id="actualites">
             <div class="admin-section-heading">
                 <p class="eyebrow">Actualites</p>
                 <h2>Piloter les articles et liens externes</h2>
@@ -116,12 +214,43 @@
                 <button type="submit">Ajouter l'actualite</button>
             </form>
 
+            <div class="admin-list-toolbar">
+                <span>{{ $articleTotal }} actualite(s)</span>
+                <form method="GET" action="{{ route('admin.articles.index') }}">
+                    <label for="articles-per-page">Afficher</label>
+                    <select id="articles-per-page" name="articles_per_page" onchange="this.form.submit()">
+                        @foreach ([10, 20, 50] as $option)
+                            <option value="{{ $option }}" @selected($articlePerPage === $option)>{{ $option }}</option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+
             <div class="admin-list">
                 @forelse ($articles as $article)
-                    <article>
+                    <details class="admin-event-item admin-article-item">
                         @php
                             $photos = $article->assets->where('type', 'photo');
                         @endphp
+                        <summary class="admin-event-summary admin-article-summary">
+                            <span class="admin-event-date">{{ $article->published_at ? $article->published_at->translatedFormat('d M') : 'Date' }}</span>
+                            <span>
+                                <strong>{{ $article->title }}</strong>
+                                <small>{{ $article->display_category }}{{ $article->source_name ? ' - '.$article->source_name : '' }}</small>
+                            </span>
+                            <span class="admin-event-badges">
+                                <small>{{ $article->is_published ? 'Publie' : 'Brouillon' }}</small>
+                                @if ($article->external_url)
+                                    <small>Lien externe</small>
+                                @else
+                                    <small>Article site</small>
+                                @endif
+                                @if ($article->image_path || $photos->isNotEmpty())
+                                    <small>Photo</small>
+                                @endif
+                            </span>
+                            <span class="admin-event-edit">Modifier</span>
+                        </summary>
                         <form method="POST" action="{{ route('admin.articles.update', $article) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
@@ -168,14 +297,22 @@
                             @method('DELETE')
                             <button class="danger-button" type="submit">Supprimer</button>
                         </form>
-                    </article>
+                    </details>
                 @empty
                     <p class="empty-admin">Aucune actualite ajoutee.</p>
                 @endforelse
             </div>
-        </section>
 
-        <section class="admin-section" id="membres">
+            @if ($articles->hasPages())
+                <div class="admin-pagination">
+                    {{ $articles->links() }}
+                </div>
+            @endif
+        </section>
+        @endif
+
+        @if ($activeSection === 'membres')
+        <section class="admin-section admin-module" id="membres">
             <div class="admin-section-heading">
                 <p class="eyebrow">Membres</p>
                 <h2>Gerer les membres</h2>
@@ -225,8 +362,10 @@
                 @endforelse
             </div>
         </section>
+        @endif
 
-        <section class="admin-section" id="fichiers">
+        @if ($activeSection === 'fichiers')
+        <section class="admin-section admin-module" id="fichiers">
             <div class="admin-section-heading">
                 <p class="eyebrow">Fichiers</p>
                 <h2>Mettre des ressources a disposition</h2>
@@ -247,11 +386,20 @@
 
             <div class="admin-table">
                 @forelse ($files as $file)
-                    <article>
-                        <div>
-                            <strong>{{ $file->title }}</strong>
-                            <span>{{ $file->audience === 'pro' ? 'Professionnels' : 'Particuliers' }} - {{ $file->category ?: 'Sans categorie' }}</span>
-                            <p>{{ $file->description }}</p>
+                    <article class="admin-file-card">
+                        <div class="admin-file-icon" aria-hidden="true">DOC</div>
+                        <div class="admin-file-content">
+                            <div class="admin-file-title">
+                                <strong>{{ $file->title }}</strong>
+                                <span>{{ $file->audience === 'pro' ? 'Professionnels' : 'Particuliers' }}</span>
+                            </div>
+                            <div class="admin-file-meta">
+                                <span>{{ $file->category ?: 'Sans categorie' }}</span>
+                                @if ($file->original_name)
+                                    <span>{{ $file->original_name }}</span>
+                                @endif
+                            </div>
+                            <p>{{ $file->description ?: 'Aucune description renseignee.' }}</p>
                         </div>
                         <div class="admin-row-actions">
                             <a href="{{ Storage::url($file->path) }}" target="_blank" rel="noreferrer">Ouvrir</a>
@@ -267,8 +415,10 @@
                 @endforelse
             </div>
         </section>
+        @endif
 
-        <section class="admin-section" id="agenda">
+        @if ($activeSection === 'agenda')
+        <section class="admin-section admin-module" id="agenda">
             <div class="admin-section-heading">
                 <p class="eyebrow">Agenda</p>
                 <h2>Gerer les evenements</h2>
@@ -315,15 +465,45 @@
                 <button type="submit">Ajouter l'evenement</button>
             </form>
 
+            <div class="admin-list-toolbar">
+                <span>{{ $eventTotal }} evenement(s)</span>
+                <form method="GET" action="{{ route('admin.events.index') }}">
+                    <label for="events-per-page">Afficher</label>
+                    <select id="events-per-page" name="events_per_page" onchange="this.form.submit()">
+                        @foreach ([10, 20, 50] as $option)
+                            <option value="{{ $option }}" @selected($eventPerPage === $option)>{{ $option }}</option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+
             <div class="admin-list">
                 @forelse ($events as $event)
-                    <article>
+                    <details class="admin-event-item">
                         @php
                             $scheduleRows = $event->schedule_items ?? [];
                             $scheduleRows = array_pad($scheduleRows, max(3, count($scheduleRows) + 1), []);
                             $photos = $event->assets->where('type', 'photo');
                             $documents = $event->assets->where('type', 'document');
                         @endphp
+                        <summary class="admin-event-summary">
+                            <span class="admin-event-date">{{ $event->event_date ? $event->event_date->translatedFormat('d M') : 'A venir' }}</span>
+                            <span>
+                                <strong>{{ $event->title }}</strong>
+                                <small>{{ $event->location ?: 'Lieu non renseigne' }}</small>
+                                @if ($event->description)
+                                    <small class="admin-event-description">{{ Str::limit($event->description, 150) }}</small>
+                                @endif
+                            </span>
+                            <span class="admin-event-badges">
+                                <small>{{ $event->is_published ? 'Publie' : 'Brouillon' }}</small>
+                                <small>{{ $event->is_paid ? 'Payant' : 'Gratuit' }}</small>
+                                @if ($event->registration_capacity)
+                                    <small>{{ $event->registrations->count() }} / {{ $event->registration_capacity }} inscrit(s)</small>
+                                @endif
+                            </span>
+                            <span class="admin-event-edit">Modifier</span>
+                        </summary>
                         <form method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
@@ -401,14 +581,22 @@
                             @method('DELETE')
                             <button class="danger-button" type="submit">Supprimer</button>
                         </form>
-                    </article>
+                    </details>
                 @empty
                     <p class="empty-admin">Aucun evenement programme.</p>
                 @endforelse
             </div>
-        </section>
 
-        <section class="admin-section" id="utilisateurs">
+            @if ($events->hasPages())
+                <div class="admin-pagination">
+                    {{ $events->links() }}
+                </div>
+            @endif
+        </section>
+        @endif
+
+        @if ($activeSection === 'utilisateurs')
+        <section class="admin-section admin-module" id="utilisateurs">
             <div class="admin-section-heading">
                 <p class="eyebrow">Utilisateurs</p>
                 <h2>Gerer les acces administration</h2>
@@ -448,6 +636,7 @@
                 @endforeach
             </div>
         </section>
+        @endif
     </div>
 </section>
 @endsection

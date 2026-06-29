@@ -3,11 +3,7 @@
 @section('title', 'Espace professionnels | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero pro-hero">
-    <p class="eyebrow">Espace professionnels</p>
-    <h1>Ressources, coordination et formation continue</h1>
-    <p>Un espace pour les sages-femmes, obstetriciens, internes, medecins generalistes, pediatres, psychologues, chercheurs et equipes impliquees dans le parcours perinatal.</p>
-</section>
+<x-page-hero page-key="pro" class="pro-hero" />
 
 @guest
 <section class="auth-gate auth-gate-top" id="connexion-pro">

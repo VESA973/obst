@@ -3,10 +3,12 @@
 @section('title', 'Nous soutenir | La Quinzaine Obstetricale')
 
 @section('content')
-<section class="page-hero join-hero">
-    <p class="eyebrow">Nous soutenir</p>
-    <h1>Rejoindre et soutenir La Quinzaine Obstetricale</h1>
-    <p>Adherer, devenir partenaire, faire un don ou proposer du benevolat permet de renforcer les actions pour la sante des femmes et la perinatalite en Guyane.</p>
+@php($joinHero = \App\Models\PageSetting::forKey('join'))
+@php($joinHeroImage = ! empty($joinHero['hero_image_path']) ? (str_starts_with($joinHero['hero_image_path'], 'images/') ? asset($joinHero['hero_image_path']) : Storage::url($joinHero['hero_image_path'])) : null)
+<section class="page-hero join-hero title-{{ $joinHero['title_size'] }}{{ $joinHeroImage ? ' has-hero-image' : '' }}" @if ($joinHeroImage) style="--page-hero-image: url('{{ $joinHeroImage }}')" @endif>
+    <p class="eyebrow">{{ $joinHero['eyebrow'] }}</p>
+    <h1>{{ $joinHero['title'] }}</h1>
+    <p>{{ $joinHero['description'] }}</p>
     <div class="hero-actions">
         <a class="btn primary" href="mailto:contact@quinzaine-obstetricale.test?subject=Demande%20d'adhesion">Adherer</a>
         <a class="btn secondary" href="#don">Faire un don</a>

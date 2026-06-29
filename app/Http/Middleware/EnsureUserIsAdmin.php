@@ -10,7 +10,11 @@ class EnsureUserIsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        abort_unless($request->user()?->is_admin, 403);
+        if (! $request->user()) {
+            return redirect()->route('admin.login');
+        }
+
+        abort_unless($request->user()->is_admin, 403);
 
         return $next($request);
     }
