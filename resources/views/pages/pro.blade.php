@@ -4,6 +4,7 @@
 
 @section('content')
 <x-page-hero page-key="pro" class="pro-hero" />
+@php($canAccessPro = auth()->check() && (auth()->user()->is_member || auth()->user()->is_admin) && auth()->user()->hasVerifiedEmail())
 
 @guest
 <section class="auth-gate auth-gate-top" id="connexion-pro">
@@ -33,10 +34,26 @@
             @enderror
 
             <button type="submit">Se connecter</button>
+            <a href="{{ route('professional.password.request') }}">Mot de passe oublié ?</a>
+            @if (\App\Models\SiteSetting::getValue('google_login_enabled', '0') === '1')
+                <a class="google-login-link" href="{{ route('professional.google.redirect') }}">Se connecter avec Google</a>
+            @endif
         </form>
     </div>
 </section>
 @endguest
+
+@auth
+    @unless ($canAccessPro)
+        <section class="auth-gate auth-gate-top">
+            <div class="auth-copy">
+                <p class="eyebrow">Compte en attente</p>
+                <h2>Confirmez votre email</h2>
+                <p>Votre compte est créé, mais l’accès aux ressources professionnelles sera ouvert après confirmation de votre adresse email.</p>
+            </div>
+        </section>
+    @endunless
+@endauth
 
 <section class="pro-intro">
     <div>
@@ -46,11 +63,11 @@
     </div>
     <div class="pro-summary">
         <span>Contenu exclusif</span>
-        <strong>@auth Disponible @else Connexion requise @endauth</strong>
+        <strong>{{ $canAccessPro ? 'Disponible' : 'Connexion requise' }}</strong>
     </div>
 </section>
 
-@auth
+@if ($canAccessPro)
 <section class="pro-layout private-content">
     <div class="pro-panel">
         <span class="private-label">Réservé pro</span>
@@ -89,5 +106,5 @@
         <a href="#">Voir les ressources</a>
     </div>
 </section>
-@endauth
+@endif
 @endsection

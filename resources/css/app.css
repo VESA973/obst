@@ -871,6 +871,29 @@ h3 {
     background: var(--coral-dark);
 }
 
+.hp-field {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.google-login-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 14px;
+    color: var(--deep-teal);
+    background: var(--white);
+    font-size: 0.9rem;
+    font-weight: 850;
+    text-decoration: none;
+}
+
 .form-error {
     margin: 0;
     color: var(--coral-dark);

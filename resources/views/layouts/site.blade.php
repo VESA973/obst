@@ -83,10 +83,16 @@
                     @enderror
 
                     <button type="submit">Se connecter</button>
+                    <a href="{{ route('professional.password.request') }}">Mot de passe oublié ?</a>
+                    @if (\App\Models\SiteSetting::getValue('google_login_enabled', '0') === '1')
+                        <a class="google-login-link" href="{{ route('professional.google.redirect') }}">Se connecter avec Google</a>
+                    @endif
                 </form>
 
                 <form class="auth-card modal-register-form accent-card" method="POST" action="{{ route('professional.register') }}">
                     @csrf
+                    <input name="website" type="text" tabindex="-1" autocomplete="off" class="hp-field" aria-hidden="true">
+                    <input name="form_started_at" type="hidden" value="{{ now()->timestamp }}">
                     <h3>Inscription</h3>
                     <label for="modal-register-name">Nom complet</label>
                     <input id="modal-register-name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required>
@@ -108,6 +114,14 @@
 
                     <label for="modal-register-password-confirmation">Confirmer le mot de passe</label>
                     <input id="modal-register-password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+
+                    <label class="check-row">
+                        <input name="is_health_professional" type="checkbox" value="1" required>
+                        <span>Je certifie être un professionnel de santé.</span>
+                    </label>
+                    @error('is_health_professional', 'register')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
 
                     <button type="submit">Créer mon accès</button>
                 </form>

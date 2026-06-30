@@ -69,6 +69,11 @@ class AdminController extends Controller
         return $this->dashboardView('inscriptions');
     }
 
+    public function professionals(): View
+    {
+        return $this->dashboardView('professionnels');
+    }
+
     private function dashboardView(string $activeSection, ?Request $request = null): View
     {
         $request ??= request();
@@ -97,6 +102,7 @@ class AdminController extends Controller
                 ? $eventQuery->paginate($eventPerPage)->withQueryString()
                 : $eventQuery->get(),
             'eventRegistrations' => EventRegistration::with('event')->latest()->get(),
+            'professionalUsers' => User::where('is_member', true)->orWhere('is_health_professional', true)->latest()->get(),
             'users' => User::orderByDesc('is_admin')->orderBy('name')->get(),
             'settings' => [
                 'maintenance_enabled' => SiteSetting::getValue('maintenance_enabled', '0'),
@@ -109,6 +115,9 @@ class AdminController extends Controller
                 'smtp_username' => SiteSetting::getValue('smtp_username', ''),
                 'smtp_from_address' => SiteSetting::getValue('smtp_from_address', ''),
                 'smtp_from_name' => SiteSetting::getValue('smtp_from_name', 'La Quinzaine Obstétricale'),
+                'google_login_enabled' => SiteSetting::getValue('google_login_enabled', '0'),
+                'google_client_id' => SiteSetting::getValue('google_client_id', ''),
+                'google_redirect_uri' => route('professional.google.callback'),
             ],
         ]);
     }
@@ -127,6 +136,9 @@ class AdminController extends Controller
             'smtp_password' => ['nullable', 'string', 'max:255'],
             'smtp_from_address' => ['nullable', 'email', 'max:255'],
             'smtp_from_name' => ['nullable', 'string', 'max:255'],
+            'google_login_enabled' => ['nullable', 'boolean'],
+            'google_client_id' => ['nullable', 'string', 'max:255'],
+            'google_client_secret' => ['nullable', 'string', 'max:255'],
         ]);
 
         SiteSetting::setValue('maintenance_enabled', $request->boolean('maintenance_enabled') ? '1' : '0');
@@ -142,6 +154,12 @@ class AdminController extends Controller
 
         if (filled($attributes['smtp_password'] ?? null)) {
             SiteSetting::setValue('smtp_password', $attributes['smtp_password']);
+        }
+        SiteSetting::setValue('google_login_enabled', $request->boolean('google_login_enabled') ? '1' : '0');
+        SiteSetting::setValue('google_client_id', $attributes['google_client_id'] ?? '');
+
+        if (filled($attributes['google_client_secret'] ?? null)) {
+            SiteSetting::setValue('google_client_secret', $attributes['google_client_secret']);
         }
 
         return back()->with('status', 'Configuration du site mise à jour.');
@@ -468,6 +486,23 @@ class AdminController extends Controller
         $user->delete();
 
         return back()->with('status', 'Utilisateur supprime.');
+    }
+
+    public function updateProfessional(Request $request, User $user): RedirectResponse
+    {
+        $attributes = $request->validate([
+            'is_member' => ['nullable', 'boolean'],
+            'is_health_professional' => ['nullable', 'boolean'],
+            'email_verified' => ['nullable', 'boolean'],
+        ]);
+
+        $user->forceFill([
+            'is_member' => $request->boolean('is_member'),
+            'is_health_professional' => $request->boolean('is_health_professional'),
+            'email_verified_at' => $request->boolean('email_verified') ? ($user->email_verified_at ?? now()) : null,
+        ])->save();
+
+        return back()->with('status', 'Compte professionnel mis à jour.');
     }
 
     private function eventAttributes(Request $request): array

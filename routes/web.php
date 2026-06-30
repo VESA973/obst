@@ -31,9 +31,18 @@ Route::get('/recherche', SearchController::class)->name('search');
 Route::get('/evenements/{event}/qr-code', EventQrCodeController::class)->name('events.qr');
 Route::post('/evenements/{event}/inscription', [EventRegistrationController::class, 'store'])->name('events.register');
 
-Route::post('/professionnels/inscription', [ProfessionalAuthController::class, 'register'])->name('professional.register');
-Route::post('/professionnels/connexion', [ProfessionalAuthController::class, 'login'])->name('professional.login');
+Route::post('/professionnels/inscription', [ProfessionalAuthController::class, 'register'])->middleware('throttle:5,1')->name('professional.register');
+Route::post('/professionnels/connexion', [ProfessionalAuthController::class, 'login'])->middleware('throttle:5,1')->name('professional.login');
 Route::post('/professionnels/deconnexion', [ProfessionalAuthController::class, 'logout'])->name('professional.logout');
+Route::get('/professionnels/email/verification/{id}/{hash}', [ProfessionalAuthController::class, 'verifyEmail'])
+    ->middleware(['auth', 'signed', 'throttle:6,1'])
+    ->name('verification.verify');
+Route::get('/professionnels/mot-de-passe-oublie', [ProfessionalAuthController::class, 'forgotPasswordForm'])->name('professional.password.request');
+Route::post('/professionnels/mot-de-passe-oublie', [ProfessionalAuthController::class, 'sendPasswordResetLink'])->middleware('throttle:5,1')->name('professional.password.email');
+Route::get('/professionnels/mot-de-passe/{token}', [ProfessionalAuthController::class, 'resetPasswordForm'])->name('password.reset');
+Route::post('/professionnels/mot-de-passe', [ProfessionalAuthController::class, 'resetPassword'])->name('professional.password.update');
+Route::get('/professionnels/google', [ProfessionalAuthController::class, 'redirectToGoogle'])->name('professional.google.redirect');
+Route::get('/professionnels/google/retour', [ProfessionalAuthController::class, 'handleGoogleCallback'])->name('professional.google.callback');
 
 Route::get('/admin', [AdminAuthController::class, 'loginForm'])->name('admin.dashboard');
 Route::get('/admin/connexion', [AdminAuthController::class, 'loginForm'])->name('admin.login');
@@ -56,6 +65,8 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/pages', [AdminController::class, 'updatePages'])->name('pages.update');
     Route::get('/actualites', [AdminController::class, 'articles'])->name('articles.index');
     Route::get('/inscriptions', [AdminController::class, 'registrations'])->name('registrations.index');
+    Route::get('/professionnels', [AdminController::class, 'professionals'])->name('professionals.index');
+    Route::put('/professionnels/{user}', [AdminController::class, 'updateProfessional'])->name('professionals.update');
     Route::get('/membres', [AdminController::class, 'members'])->name('members.index');
     Route::post('/membres', [AdminController::class, 'storeMember'])->name('members.store');
     Route::put('/membres/{member}', [AdminController::class, 'updateMember'])->name('members.update');

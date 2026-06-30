@@ -32,7 +32,8 @@
         <a href="{{ route('admin.files.index') }}" @class(['active' => $activeSection === 'fichiers'])><span>05</span> Fichiers</a>
         <a href="{{ route('admin.events.index') }}" @class(['active' => $activeSection === 'agenda'])><span>06</span> Agenda</a>
         <a href="{{ route('admin.registrations.index') }}" @class(['active' => $activeSection === 'inscriptions'])><span>07</span> Inscriptions</a>
-        <a href="{{ route('admin.users.index') }}" @class(['active' => $activeSection === 'utilisateurs'])><span>08</span> Utilisateurs</a>
+        <a href="{{ route('admin.professionals.index') }}" @class(['active' => $activeSection === 'professionnels'])><span>08</span> Professionnels</a>
+        <a href="{{ route('admin.users.index') }}" @class(['active' => $activeSection === 'utilisateurs'])><span>09</span> Utilisateurs</a>
         <a href="{{ route('home') }}"><span>↗</span> Voir le site</a>
         <form class="admin-sidebar-logout" method="POST" action="{{ route('admin.logout') }}">
             @csrf
@@ -70,6 +71,7 @@
             <a href="{{ route('admin.files.index') }}"><strong>Fichiers</strong><span>Ressources publiques et pro</span></a>
             <a href="{{ route('admin.events.index') }}"><strong>Agenda</strong><span>Événements, QR codes, inscriptions</span></a>
             <a href="{{ route('admin.registrations.index') }}"><strong>Inscriptions</strong><span>Participants et export CSV</span></a>
+            <a href="{{ route('admin.professionals.index') }}"><strong>Professionnels</strong><span>Comptes, accès et validation email</span></a>
             <a href="{{ route('admin.users.index') }}"><strong>Utilisateurs</strong><span>Admins et comptes membres</span></a>
         </section>
         @endif
@@ -121,6 +123,16 @@
                 <input name="smtp_password" type="password" placeholder="Mot de passe SMTP (laisser vide pour conserver)">
                 <input name="smtp_from_address" type="email" value="{{ $settings['smtp_from_address'] }}" placeholder="Adresse email d'envoi">
                 <input name="smtp_from_name" value="{{ $settings['smtp_from_name'] }}" placeholder="Nom d'expéditeur">
+                <label class="admin-check">
+                    <input name="google_login_enabled" type="checkbox" value="1" @checked($settings['google_login_enabled'] === '1')>
+                    Activer la connexion Google
+                </label>
+                <input name="google_client_id" value="{{ $settings['google_client_id'] }}" placeholder="Google Client ID">
+                <input name="google_client_secret" type="password" placeholder="Google Client Secret (laisser vide pour conserver)">
+                <label>
+                    URL de redirection Google
+                    <input value="{{ $settings['google_redirect_uri'] }}" readonly>
+                </label>
                 <button type="submit">Enregistrer la configuration</button>
             </form>
         </section>
@@ -679,6 +691,46 @@
                     </article>
                 @empty
                     <p class="empty-admin">Aucune inscription enregistrée.</p>
+                @endforelse
+            </div>
+        </section>
+        @endif
+
+        @if ($activeSection === 'professionnels')
+        <section class="admin-section admin-module" id="professionnels">
+            <div class="admin-section-heading">
+                <p class="eyebrow">Espace pro</p>
+                <h2>Gérer les comptes professionnels</h2>
+                <p>Activez ou désactivez l'accès à l'espace professionnel et contrôlez la validation email.</p>
+            </div>
+
+            <div class="admin-list">
+                @forelse ($professionalUsers as $professional)
+                    <article>
+                        <form method="POST" action="{{ route('admin.professionals.update', $professional) }}">
+                            @csrf
+                            @method('PUT')
+                            <div>
+                                <strong>{{ $professional->name }}</strong>
+                                <small>{{ $professional->email }}</small>
+                            </div>
+                            <label class="admin-check">
+                                <input name="is_member" type="checkbox" value="1" @checked($professional->is_member)>
+                                Accès espace pro
+                            </label>
+                            <label class="admin-check">
+                                <input name="is_health_professional" type="checkbox" value="1" @checked($professional->is_health_professional)>
+                                Certifié professionnel de santé
+                            </label>
+                            <label class="admin-check">
+                                <input name="email_verified" type="checkbox" value="1" @checked($professional->hasVerifiedEmail())>
+                                Email confirmé
+                            </label>
+                            <button type="submit">Mettre à jour</button>
+                        </form>
+                    </article>
+                @empty
+                    <p class="empty-admin">Aucun professionnel inscrit.</p>
                 @endforelse
             </div>
         </section>
