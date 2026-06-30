@@ -51,10 +51,31 @@ class AdminAuthTest extends TestCase
         $this->post(route('admin.login.store'), [
             'email' => 'admin@example.com',
             'password' => 'password',
+            ...$this->validAntiBotPayload('admin_login'),
         ])
             ->assertRedirect(route('admin.home'));
 
         $this->assertAuthenticatedAs($admin);
+    }
+
+    public function test_admin_login_requires_valid_anti_bot_challenge(): void
+    {
+        User::factory()->create([
+            'email' => 'admin@example.com',
+            'is_admin' => true,
+        ]);
+
+        $this->post(route('admin.login.store'), [
+            'email' => 'admin@example.com',
+            'password' => 'password',
+            'website' => '',
+            'form_started_at' => now()->subSeconds(5)->timestamp,
+            'antibot_token' => 'missing-token',
+            'antibot_answer' => '4',
+        ])
+            ->assertSessionHasErrors('antibot_answer');
+
+        $this->assertGuest();
     }
 
     public function test_admin_dashboard_uses_dedicated_admin_layout(): void
@@ -364,6 +385,7 @@ class AdminAuthTest extends TestCase
         $this->post(route('admin.login.store'), [
             'email' => 'member@example.com',
             'password' => 'password',
+            ...$this->validAntiBotPayload('admin_login'),
         ])
             ->assertSessionHasErrors('email');
 

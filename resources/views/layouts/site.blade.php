@@ -82,6 +82,8 @@
                         <p class="form-error">{{ $message }}</p>
                     @enderror
 
+                    <x-anti-bot key="professional_login" />
+
                     <button type="submit">Se connecter</button>
                     <a href="{{ route('professional.password.request') }}">Mot de passe oublié ?</a>
                     @if (\App\Models\SiteSetting::getValue('google_login_enabled', '0') === '1')
@@ -91,8 +93,6 @@
 
                 <form class="auth-card modal-register-form accent-card" method="POST" action="{{ route('professional.register') }}">
                     @csrf
-                    <input name="website" type="text" tabindex="-1" autocomplete="off" class="hp-field" aria-hidden="true">
-                    <input name="form_started_at" type="hidden" value="{{ now()->timestamp }}">
                     <h3>Inscription</h3>
                     <label for="modal-register-name">Nom complet</label>
                     <input id="modal-register-name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required>
@@ -122,6 +122,8 @@
                     @error('is_health_professional', 'register')
                         <p class="form-error">{{ $message }}</p>
                     @enderror
+
+                    <x-anti-bot key="professional_register" error-bag="register" />
 
                     <button type="submit">Créer mon accès</button>
                 </form>

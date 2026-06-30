@@ -34,6 +34,8 @@
                 Garder la session ouverte
             </label>
 
+            <x-anti-bot key="admin_login" />
+
             <button type="submit">Entrer dans l'admin</button>
         </form>
     </div>

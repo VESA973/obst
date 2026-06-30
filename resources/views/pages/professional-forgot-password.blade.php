@@ -17,6 +17,7 @@
         @error('email')
             <p class="form-error">{{ $message }}</p>
         @enderror
+        <x-anti-bot key="professional_password_reset" />
         <button type="submit">Envoyer le lien</button>
     </form>
 </section>

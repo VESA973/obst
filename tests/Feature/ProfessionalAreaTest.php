@@ -64,7 +64,7 @@ class ProfessionalAreaTest extends TestCase
             'password' => 'password-secure',
             'password_confirmation' => 'password-secure',
             'is_health_professional' => '1',
-            'form_started_at' => now()->subSeconds(5)->timestamp,
+            ...$this->validAntiBotPayload('professional_register'),
         ])
             ->assertRedirect(route('pro'));
 
@@ -88,7 +88,7 @@ class ProfessionalAreaTest extends TestCase
                 'password' => 'password-secure',
                 'password_confirmation' => 'password-secure',
                 'is_health_professional' => '1',
-                'form_started_at' => now()->subSeconds(5)->timestamp,
+                ...$this->validAntiBotPayload('professional_register'),
             ])
             ->assertOk()
             ->assertSee('Compte créé')
@@ -103,9 +103,27 @@ class ProfessionalAreaTest extends TestCase
             'email' => 'missing@example.com',
             'password' => 'password-secure',
             'password_confirmation' => 'password-secure',
-            'form_started_at' => now()->subSeconds(5)->timestamp,
+            ...$this->validAntiBotPayload('professional_register'),
         ])
             ->assertSessionHasErrors('is_health_professional', null, 'register');
+    }
+
+    public function test_professional_registration_requires_valid_anti_bot_challenge(): void
+    {
+        Notification::fake();
+
+        $this->post(route('professional.register'), [
+            'name' => 'Robot Missing',
+            'email' => 'robot-missing@example.com',
+            'password' => 'password-secure',
+            'password_confirmation' => 'password-secure',
+            'is_health_professional' => '1',
+        ])
+            ->assertSessionHasErrors('antibot_answer', null, 'register');
+
+        $this->assertDatabaseMissing('users', [
+            'email' => 'robot-missing@example.com',
+        ]);
     }
 
     public function test_email_verification_link_works_without_authenticated_session(): void
@@ -142,7 +160,7 @@ class ProfessionalAreaTest extends TestCase
             'password' => 'password-secure',
             'password_confirmation' => 'password-secure',
             'is_health_professional' => '1',
-            'form_started_at' => now()->subSeconds(5)->timestamp,
+            ...$this->validAntiBotPayload('professional_register'),
         ])
             ->assertRedirect(route('pro'));
 
@@ -174,8 +192,8 @@ class ProfessionalAreaTest extends TestCase
             'password' => 'password-secure',
             'password_confirmation' => 'password-secure',
             'is_health_professional' => '1',
+            ...$this->validAntiBotPayload('professional_register'),
             'website' => 'https://spam.test',
-            'form_started_at' => now()->subSeconds(5)->timestamp,
         ])
             ->assertSessionHasErrors('website', null, 'register');
     }
@@ -191,6 +209,7 @@ class ProfessionalAreaTest extends TestCase
 
         $this->post(route('professional.password.email'), [
             'email' => 'pro@example.com',
+            ...$this->validAntiBotPayload('professional_password_reset'),
         ])->assertSessionHasNoErrors();
 
         Notification::assertSentTo($user, ProfessionalResetPasswordNotification::class);

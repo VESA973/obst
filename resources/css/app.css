@@ -896,6 +896,25 @@ h3 {
     opacity: 0;
 }
 
+.captcha-field {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--mint) 34%, var(--white));
+    color: var(--deep-teal);
+    font-weight: 850;
+}
+
+.captcha-field span {
+    font-size: 0.9rem;
+}
+
+.captcha-field input {
+    background: var(--white);
+}
+
 .google-login-link {
     display: inline-flex;
     align-items: center;

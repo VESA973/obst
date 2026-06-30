@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\AntiBotChallenge;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,8 @@ class AdminAuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
+        AntiBotChallenge::verify($request, 'admin_login');
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],

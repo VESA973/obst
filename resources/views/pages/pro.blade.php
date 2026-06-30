@@ -33,6 +33,8 @@
                 <p class="form-error">{{ $message }}</p>
             @enderror
 
+            <x-anti-bot key="professional_login" />
+
             <button type="submit">Se connecter</button>
             <a href="{{ route('professional.password.request') }}">Mot de passe oublié ?</a>
             @if (\App\Models\SiteSetting::getValue('google_login_enabled', '0') === '1')

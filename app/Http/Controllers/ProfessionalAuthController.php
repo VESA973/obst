@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Support\AntiBotChallenge;
 use App\Support\SiteMailerConfigurator;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
@@ -21,23 +22,14 @@ class ProfessionalAuthController extends Controller
 {
     public function register(Request $request): RedirectResponse
     {
+        AntiBotChallenge::verify($request, 'professional_register', 'register');
+
         $attributes = $request->validateWithBag('register', [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'confirmed', PasswordRule::min(8)],
             'is_health_professional' => ['accepted'],
-            'website' => ['nullable', 'prohibited'],
-            'form_started_at' => ['required', 'integer'],
         ]);
-
-        if (now()->timestamp - (int) $attributes['form_started_at'] < 3) {
-            $exception = ValidationException::withMessages([
-                'email' => 'Merci de patienter quelques secondes avant de valider le formulaire.',
-            ]);
-            $exception->errorBag = 'register';
-
-            throw $exception;
-        }
 
         $user = User::where('email', $attributes['email'])->first();
 
@@ -78,6 +70,8 @@ class ProfessionalAuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
+        AntiBotChallenge::verify($request, 'professional_login');
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -137,6 +131,8 @@ class ProfessionalAuthController extends Controller
 
     public function sendPasswordResetLink(Request $request): RedirectResponse
     {
+        AntiBotChallenge::verify($request, 'professional_password_reset');
+
         $request->validate(['email' => ['required', 'email']]);
 
         SiteMailerConfigurator::apply();
