@@ -23,7 +23,7 @@ class ProfessionalAuthController extends Controller
     {
         $attributes = $request->validateWithBag('register', [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'confirmed', PasswordRule::min(8)],
             'is_health_professional' => ['accepted'],
             'website' => ['nullable', 'prohibited'],
@@ -39,13 +39,33 @@ class ProfessionalAuthController extends Controller
             throw $exception;
         }
 
-        $user = User::create([
-            'name' => $attributes['name'],
-            'email' => $attributes['email'],
-            'password' => $attributes['password'],
-            'is_member' => true,
-            'is_health_professional' => true,
-        ]);
+        $user = User::where('email', $attributes['email'])->first();
+
+        if ($user?->hasVerifiedEmail()) {
+            $exception = ValidationException::withMessages([
+                'email' => 'Un compte existe déjà avec cette adresse email.',
+            ]);
+            $exception->errorBag = 'register';
+
+            throw $exception;
+        }
+
+        if ($user) {
+            $user->forceFill([
+                'name' => $attributes['name'],
+                'password' => $attributes['password'],
+                'is_member' => true,
+                'is_health_professional' => true,
+            ])->save();
+        } else {
+            $user = User::create([
+                'name' => $attributes['name'],
+                'email' => $attributes['email'],
+                'password' => $attributes['password'],
+                'is_member' => true,
+                'is_health_professional' => true,
+            ]);
+        }
 
         SiteMailerConfigurator::apply();
         $user->sendEmailVerificationNotification();

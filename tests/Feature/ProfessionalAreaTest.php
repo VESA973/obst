@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\SiteSetting;
+use App\Support\SiteMailerConfigurator;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class ProfessionalAreaTest extends TestCase
@@ -70,6 +73,45 @@ class ProfessionalAreaTest extends TestCase
         $this->assertTrue($user->is_health_professional);
         $this->assertNull($user->email_verified_at);
         Notification::assertSentTo($user, VerifyEmail::class);
+    }
+
+    public function test_unverified_professional_can_request_a_new_verification_email_by_registering_again(): void
+    {
+        Notification::fake();
+        User::factory()->unverified()->create([
+            'email' => 'retry@example.com',
+            'is_member' => true,
+            'is_health_professional' => true,
+        ]);
+
+        $this->post(route('professional.register'), [
+            'name' => 'Dr Retry',
+            'email' => 'retry@example.com',
+            'password' => 'password-secure',
+            'password_confirmation' => 'password-secure',
+            'is_health_professional' => '1',
+            'form_started_at' => now()->subSeconds(5)->timestamp,
+        ])
+            ->assertRedirect(route('pro'));
+
+        $user = User::where('email', 'retry@example.com')->firstOrFail();
+        Notification::assertSentTo($user, VerifyEmail::class);
+        $this->assertSame('Dr Retry', $user->name);
+    }
+
+    public function test_site_mailer_maps_ssl_to_smtps_scheme(): void
+    {
+        SiteSetting::setValue('smtp_mailer', 'smtp');
+        SiteSetting::setValue('smtp_encryption', 'ssl');
+        SiteSetting::setValue('smtp_host', 'smtp.example.com');
+        SiteSetting::setValue('smtp_port', '465');
+
+        SiteMailerConfigurator::apply();
+
+        $this->assertSame('smtp', Config::get('mail.default'));
+        $this->assertSame('smtps', Config::get('mail.mailers.smtp.scheme'));
+        $this->assertSame('smtp.example.com', Config::get('mail.mailers.smtp.host'));
+        $this->assertSame(465, Config::get('mail.mailers.smtp.port'));
     }
 
     public function test_professional_registration_rejects_honeypot(): void

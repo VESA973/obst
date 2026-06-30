@@ -25,6 +25,15 @@ class SiteMailerConfigurator
         Config::set('mail.mailers.smtp.port', (int) (SiteSetting::getValue('smtp_port') ?: config('mail.mailers.smtp.port')));
         Config::set('mail.mailers.smtp.username', SiteSetting::getValue('smtp_username') ?: config('mail.mailers.smtp.username'));
         Config::set('mail.mailers.smtp.password', SiteSetting::getValue('smtp_password') ?: config('mail.mailers.smtp.password'));
-        Config::set('mail.mailers.smtp.scheme', SiteSetting::getValue('smtp_encryption') ?: null);
+        Config::set('mail.mailers.smtp.scheme', self::smtpScheme(SiteSetting::getValue('smtp_encryption')));
+    }
+
+    private static function smtpScheme(?string $encryption): ?string
+    {
+        return match ($encryption) {
+            'ssl' => 'smtps',
+            'tls' => 'smtp',
+            default => null,
+        };
     }
 }
