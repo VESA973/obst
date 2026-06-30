@@ -13,6 +13,9 @@ class ArticleCategory extends Model
     protected $fillable = [
         'name',
         'slug',
+        'section',
+        'title',
+        'description',
     ];
 
     public function articles(): HasMany

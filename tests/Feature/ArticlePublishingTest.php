@@ -116,6 +116,45 @@ class ArticlePublishingTest extends TestCase
             ->assertSee('Prevention');
     }
 
+    public function test_public_health_category_lists_its_articles(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.article-categories.store'), [
+                'name' => 'Endométriose',
+                'section' => 'public',
+                'title' => 'Comprendre l’endométriose',
+                'description' => 'Articles et repères sur le parcours de soin.',
+            ])
+            ->assertRedirect();
+
+        $category = \App\Models\ArticleCategory::where('name', 'Endométriose')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->post(route('admin.articles.store'), [
+                'title' => 'Repères utiles',
+                'article_category_id' => $category->id,
+                'excerpt' => 'Un article classé dans Santé de la femme.',
+            ])
+            ->assertRedirect();
+
+        $this->get(route('public'))
+            ->assertOk()
+            ->assertSee('Comprendre l’endométriose')
+            ->assertSee(route('public.category', $category));
+
+        $this->get(route('public.category', $category))
+            ->assertOk()
+            ->assertSee('Repères utiles')
+            ->assertSee(route('public.article', [$category, 'reperes-utiles']));
+
+        $this->get(route('public.article', [$category, 'reperes-utiles']))
+            ->assertOk()
+            ->assertSee('Repères utiles')
+            ->assertSee('Retour à Endométriose');
+    }
+
     public function test_admin_can_choose_how_many_articles_are_listed(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);

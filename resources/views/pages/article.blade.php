@@ -8,7 +8,7 @@
 @endphp
 
 <section class="page-hero compact">
-    <p class="eyebrow">{{ $article->display_category ?: 'Actualite' }}</p>
+    <p class="eyebrow">{{ $article->display_category ?: 'Actualité' }}</p>
     <h1>{{ $article->title }}</h1>
     @if ($article->excerpt)
         <p>{{ $article->excerpt }}</p>
@@ -43,7 +43,7 @@
     @endif
 
     <div class="article-actions">
-        <a class="btn secondary" href="{{ route('news') }}">Retour aux actualites</a>
+        <a class="btn secondary" href="{{ $backRoute ?? route('news') }}">{{ $backLabel ?? 'Retour aux actualités' }}</a>
         @if ($article->external_url)
             <a class="btn" href="{{ $article->external_url }}" target="_blank" rel="noreferrer">Lire sur {{ $article->source_name ?: 'le site source' }}</a>
         @endif

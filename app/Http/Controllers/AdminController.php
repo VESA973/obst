@@ -7,6 +7,7 @@ use App\Models\ArticleAsset;
 use App\Models\ArticleCategory;
 use App\Models\Event;
 use App\Models\EventAsset;
+use App\Models\EventRegistration;
 use App\Models\Member;
 use App\Models\PageSetting;
 use App\Models\ResourceFile;
@@ -19,6 +20,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminController extends Controller
 {
@@ -62,6 +64,11 @@ class AdminController extends Controller
         return $this->dashboardView('utilisateurs');
     }
 
+    public function registrations(): View
+    {
+        return $this->dashboardView('inscriptions');
+    }
+
     private function dashboardView(string $activeSection, ?Request $request = null): View
     {
         $request ??= request();
@@ -74,7 +81,8 @@ class AdminController extends Controller
 
         return view('admin.dashboard', [
             'activeSection' => $activeSection,
-            'articleCategories' => ArticleCategory::withCount('articles')->orderBy('name')->get(),
+            'articleCategories' => ArticleCategory::withCount('articles')->orderBy('section')->orderBy('name')->get(),
+            'publicCategories' => ArticleCategory::where('section', 'public')->withCount('articles')->orderBy('name')->get(),
             'pageSettings' => PageSetting::allConfigured(),
             'articlePerPage' => $articlePerPage,
             'articleTotal' => Article::count(),
@@ -88,11 +96,19 @@ class AdminController extends Controller
             'events' => $activeSection === 'agenda'
                 ? $eventQuery->paginate($eventPerPage)->withQueryString()
                 : $eventQuery->get(),
+            'eventRegistrations' => EventRegistration::with('event')->latest()->get(),
             'users' => User::orderByDesc('is_admin')->orderBy('name')->get(),
             'settings' => [
                 'maintenance_enabled' => SiteSetting::getValue('maintenance_enabled', '0'),
                 'maintenance_message' => SiteSetting::getValue('maintenance_message', 'Le site est temporairement en maintenance. Merci de revenir dans quelques instants.'),
                 'admin_note' => SiteSetting::getValue('admin_note', ''),
+                'smtp_mailer' => SiteSetting::getValue('smtp_mailer', 'smtp'),
+                'smtp_host' => SiteSetting::getValue('smtp_host', ''),
+                'smtp_port' => SiteSetting::getValue('smtp_port', '465'),
+                'smtp_encryption' => SiteSetting::getValue('smtp_encryption', 'ssl'),
+                'smtp_username' => SiteSetting::getValue('smtp_username', ''),
+                'smtp_from_address' => SiteSetting::getValue('smtp_from_address', ''),
+                'smtp_from_name' => SiteSetting::getValue('smtp_from_name', 'La Quinzaine Obstétricale'),
             ],
         ]);
     }
@@ -103,13 +119,32 @@ class AdminController extends Controller
             'maintenance_enabled' => ['nullable', 'boolean'],
             'maintenance_message' => ['required', 'string', 'max:500'],
             'admin_note' => ['nullable', 'string', 'max:1000'],
+            'smtp_mailer' => ['required', Rule::in(['smtp', 'log'])],
+            'smtp_host' => ['nullable', 'string', 'max:255'],
+            'smtp_port' => ['nullable', 'integer', 'min:1', 'max:65535'],
+            'smtp_encryption' => ['nullable', Rule::in(['ssl', 'tls', ''])],
+            'smtp_username' => ['nullable', 'string', 'max:255'],
+            'smtp_password' => ['nullable', 'string', 'max:255'],
+            'smtp_from_address' => ['nullable', 'email', 'max:255'],
+            'smtp_from_name' => ['nullable', 'string', 'max:255'],
         ]);
 
         SiteSetting::setValue('maintenance_enabled', $request->boolean('maintenance_enabled') ? '1' : '0');
         SiteSetting::setValue('maintenance_message', $attributes['maintenance_message']);
         SiteSetting::setValue('admin_note', $attributes['admin_note'] ?? '');
+        SiteSetting::setValue('smtp_mailer', $attributes['smtp_mailer']);
+        SiteSetting::setValue('smtp_host', $attributes['smtp_host'] ?? '');
+        SiteSetting::setValue('smtp_port', (string) ($attributes['smtp_port'] ?? 465));
+        SiteSetting::setValue('smtp_encryption', $attributes['smtp_encryption'] ?? '');
+        SiteSetting::setValue('smtp_username', $attributes['smtp_username'] ?? '');
+        SiteSetting::setValue('smtp_from_address', $attributes['smtp_from_address'] ?? '');
+        SiteSetting::setValue('smtp_from_name', $attributes['smtp_from_name'] ?? '');
 
-        return back()->with('status', 'Configuration du site mise a jour.');
+        if (filled($attributes['smtp_password'] ?? null)) {
+            SiteSetting::setValue('smtp_password', $attributes['smtp_password']);
+        }
+
+        return back()->with('status', 'Configuration du site mise à jour.');
     }
 
     public function updatePages(Request $request): RedirectResponse
@@ -214,21 +249,70 @@ class AdminController extends Controller
     {
         $attributes = $request->validate([
             'name' => ['required', 'string', 'max:120', 'unique:article_categories,name'],
+            'section' => ['nullable', Rule::in(['news', 'public'])],
+            'title' => ['nullable', 'string', 'max:180'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ]);
 
         ArticleCategory::create([
             'name' => $attributes['name'],
             'slug' => $this->uniqueCategorySlug($attributes['name']),
+            'section' => $attributes['section'] ?? 'news',
+            'title' => $attributes['title'] ?? $attributes['name'],
+            'description' => $attributes['description'] ?? null,
         ]);
 
-        return back()->with('status', 'Categorie ajoutee.');
+        return back()->with('status', 'Catégorie ajoutée.');
+    }
+
+    public function updateArticleCategory(Request $request, ArticleCategory $category): RedirectResponse
+    {
+        $attributes = $request->validate([
+            'name' => ['required', 'string', 'max:120', Rule::unique('article_categories', 'name')->ignore($category)],
+            'section' => ['required', Rule::in(['news', 'public'])],
+            'title' => ['nullable', 'string', 'max:180'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        if ($category->name !== $attributes['name']) {
+            $attributes['slug'] = $this->uniqueCategorySlug($attributes['name']);
+        }
+
+        $category->update($attributes);
+
+        return back()->with('status', 'Catégorie mise à jour.');
     }
 
     public function destroyArticleCategory(ArticleCategory $category): RedirectResponse
     {
         $category->delete();
 
-        return back()->with('status', 'Categorie supprimee.');
+        return back()->with('status', 'Catégorie supprimée.');
+    }
+
+    public function exportEventRegistrations(): StreamedResponse
+    {
+        $registrations = EventRegistration::with('event')->latest()->get();
+
+        return response()->streamDownload(function () use ($registrations): void {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['Événement', 'Date', 'Nom', 'Email', 'Téléphone', 'Inscrit le']);
+
+            foreach ($registrations as $registration) {
+                fputcsv($output, [
+                    $registration->event?->title,
+                    optional($registration->event?->event_date)->format('Y-m-d'),
+                    $registration->name,
+                    $registration->email,
+                    $registration->phone,
+                    $registration->created_at?->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($output);
+        }, 'inscriptions-evenements.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function storeArticle(Request $request): RedirectResponse

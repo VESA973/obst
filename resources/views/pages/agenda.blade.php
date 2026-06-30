@@ -108,7 +108,7 @@
                     </div>
                     @if ($event->is_paid)
                         @if ($event->registration_url)
-                            <a class="event-register-link" href="{{ $event->registration_url }}" target="_blank" rel="noreferrer">S'inscrire sur HelloAsso</a>
+                            <a class="event-register-link" href="{{ $event->registration_url }}" target="_blank" rel="noreferrer">S'inscrire</a>
                         @endif
                     @else
                         <form class="event-registration-form" method="POST" action="{{ route('events.register', $event) }}">
@@ -116,8 +116,7 @@
                             <input name="name" placeholder="Nom complet" required>
                             <input name="email" type="email" placeholder="Email" required>
                             <input name="phone" placeholder="Téléphone">
-                            <textarea name="notes" placeholder="Message optionnel"></textarea>
-                            <button type="submit">S'inscrire gratuitement</button>
+                            <button type="submit">S'inscrire</button>
                             @if ($event->registration_capacity)
                                 <small>{{ $event->registrations_count }} / {{ $event->registration_capacity }} inscrit(s)</small>
                             @endif

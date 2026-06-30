@@ -15,7 +15,6 @@ class EventRegistration extends Model
         'name',
         'email',
         'phone',
-        'notes',
     ];
 
     public function event(): BelongsTo

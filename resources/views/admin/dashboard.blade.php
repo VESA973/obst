@@ -31,7 +31,8 @@
         <a href="{{ route('admin.members.index') }}" @class(['active' => $activeSection === 'membres'])><span>04</span> Membres</a>
         <a href="{{ route('admin.files.index') }}" @class(['active' => $activeSection === 'fichiers'])><span>05</span> Fichiers</a>
         <a href="{{ route('admin.events.index') }}" @class(['active' => $activeSection === 'agenda'])><span>06</span> Agenda</a>
-        <a href="{{ route('admin.users.index') }}" @class(['active' => $activeSection === 'utilisateurs'])><span>07</span> Utilisateurs</a>
+        <a href="{{ route('admin.registrations.index') }}" @class(['active' => $activeSection === 'inscriptions'])><span>07</span> Inscriptions</a>
+        <a href="{{ route('admin.users.index') }}" @class(['active' => $activeSection === 'utilisateurs'])><span>08</span> Utilisateurs</a>
         <a href="{{ route('home') }}"><span>↗</span> Voir le site</a>
         <form class="admin-sidebar-logout" method="POST" action="{{ route('admin.logout') }}">
             @csrf
@@ -68,6 +69,7 @@
             <a href="{{ route('admin.members.index') }}"><strong>Membres</strong><span>Contacts et statuts</span></a>
             <a href="{{ route('admin.files.index') }}"><strong>Fichiers</strong><span>Ressources publiques et pro</span></a>
             <a href="{{ route('admin.events.index') }}"><strong>Agenda</strong><span>Événements, QR codes, inscriptions</span></a>
+            <a href="{{ route('admin.registrations.index') }}"><strong>Inscriptions</strong><span>Participants et export CSV</span></a>
             <a href="{{ route('admin.users.index') }}"><strong>Utilisateurs</strong><span>Admins et comptes membres</span></a>
         </section>
         @endif
@@ -98,6 +100,27 @@
                     Note interne
                     <textarea name="admin_note" placeholder="Information visible uniquement dans l'administration">{{ $settings['admin_note'] }}</textarea>
                 </label>
+                <label>
+                    Envoi des emails
+                    <select name="smtp_mailer" required>
+                        <option value="smtp" @selected($settings['smtp_mailer'] === 'smtp')>SMTP</option>
+                        <option value="log" @selected($settings['smtp_mailer'] === 'log')>Test local sans envoi</option>
+                    </select>
+                </label>
+                <input name="smtp_host" value="{{ $settings['smtp_host'] }}" placeholder="Serveur SMTP">
+                <input name="smtp_port" type="number" min="1" max="65535" value="{{ $settings['smtp_port'] }}" placeholder="Port SMTP">
+                <label>
+                    Sécurité SMTP
+                    <select name="smtp_encryption">
+                        <option value="ssl" @selected($settings['smtp_encryption'] === 'ssl')>SSL</option>
+                        <option value="tls" @selected($settings['smtp_encryption'] === 'tls')>TLS</option>
+                        <option value="" @selected($settings['smtp_encryption'] === '')>Aucune</option>
+                    </select>
+                </label>
+                <input name="smtp_username" value="{{ $settings['smtp_username'] }}" placeholder="Identifiant SMTP">
+                <input name="smtp_password" type="password" placeholder="Mot de passe SMTP (laisser vide pour conserver)">
+                <input name="smtp_from_address" type="email" value="{{ $settings['smtp_from_address'] }}" placeholder="Adresse email d'envoi">
+                <input name="smtp_from_name" value="{{ $settings['smtp_from_name'] }}" placeholder="Nom d'expéditeur">
                 <button type="submit">Enregistrer la configuration</button>
             </form>
         </section>
@@ -169,19 +192,41 @@
             </div>
 
             <div class="category-manager">
-                <form method="POST" action="{{ route('admin.article-categories.store') }}">
+                <form class="category-form" method="POST" action="{{ route('admin.article-categories.store') }}">
                     @csrf
-                    <input name="name" placeholder="Nouvelle catégorie" required>
+                    <input name="name" placeholder="Nom de la catégorie" required>
+                    <input name="title" placeholder="Titre affiché">
+                    <select name="section" required>
+                        <option value="news">Actualités</option>
+                        <option value="public">Santé de la femme</option>
+                    </select>
+                    <textarea name="description" placeholder="Description de la catégorie"></textarea>
                     <button type="submit">Ajouter la catégorie</button>
                 </form>
                 <div>
                     @forelse ($articleCategories as $category)
-                        <form method="POST" action="{{ route('admin.article-categories.destroy', $category) }}">
-                            @csrf
-                            @method('DELETE')
-                            <span>{{ $category->name }} - {{ $category->articles_count }} article(s)</span>
-                            <button class="danger-button" type="submit">Supprimer</button>
-                        </form>
+                        <details class="category-edit-item">
+                            <summary>
+                                <span>{{ $category->name }} - {{ $category->section === 'public' ? 'Santé de la femme' : 'Actualités' }} - {{ $category->articles_count }} article(s)</span>
+                            </summary>
+                            <form class="category-form" method="POST" action="{{ route('admin.article-categories.update', $category) }}">
+                                @csrf
+                                @method('PUT')
+                                <input name="name" value="{{ $category->name }}" required>
+                                <input name="title" value="{{ $category->title }}" placeholder="Titre affiché">
+                                <select name="section" required>
+                                    <option value="news" @selected($category->section === 'news')>Actualités</option>
+                                    <option value="public" @selected($category->section === 'public')>Santé de la femme</option>
+                                </select>
+                                <textarea name="description" placeholder="Description">{{ $category->description }}</textarea>
+                                <button type="submit">Mettre à jour</button>
+                            </form>
+                            <form method="POST" action="{{ route('admin.article-categories.destroy', $category) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="danger-button" type="submit">Supprimer</button>
+                            </form>
+                        </details>
                     @empty
                         <span>Aucune catégorie créée.</span>
                     @endforelse
@@ -194,7 +239,7 @@
                 <select name="article_category_id">
                     <option value="">Sans catégorie</option>
                     @foreach ($articleCategories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        <option value="{{ $category->id }}">{{ $category->section === 'public' ? 'Santé de la femme' : 'Actualités' }} - {{ $category->name }}</option>
                     @endforeach
                 </select>
                 <input name="source_name" placeholder="Source externe">
@@ -258,7 +303,7 @@
                             <select name="article_category_id">
                                 <option value="">Sans catégorie</option>
                                 @foreach ($articleCategories as $category)
-                                    <option value="{{ $category->id }}" @selected($article->article_category_id === $category->id)>{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" @selected($article->article_category_id === $category->id)>{{ $category->section === 'public' ? 'Santé de la femme' : 'Actualités' }} - {{ $category->name }}</option>
                                 @endforeach
                             </select>
                             <input name="source_name" value="{{ $article->source_name }}" placeholder="Source externe">
@@ -592,6 +637,39 @@
                     {{ $events->links() }}
                 </div>
             @endif
+        </section>
+        @endif
+
+        @if ($activeSection === 'inscriptions')
+        <section class="admin-section admin-module" id="inscriptions">
+            <div class="admin-section-heading">
+                <p class="eyebrow">Inscriptions</p>
+                <h2>Tableau des inscriptions aux événements</h2>
+                <p>Consultez tous les participants inscrits aux événements gratuits et exportez la liste en CSV.</p>
+            </div>
+
+            <div class="admin-list-toolbar">
+                <span>{{ $eventRegistrations->count() }} inscription(s)</span>
+                <a class="admin-site-link" href="{{ route('admin.events.registrations.export') }}">Exporter en CSV</a>
+            </div>
+
+            <div class="admin-table registration-table">
+                @forelse ($eventRegistrations as $registration)
+                    <article>
+                        <div>
+                            <strong>{{ $registration->event?->title ?: 'Événement supprimé' }}</strong>
+                            <span>{{ $registration->event?->event_date ? $registration->event->event_date->translatedFormat('d F Y') : 'Date non renseignée' }}</span>
+                        </div>
+                        <div>
+                            <strong>{{ $registration->name }}</strong>
+                            <span>{{ $registration->email }}{{ $registration->phone ? ' - '.$registration->phone : '' }}</span>
+                        </div>
+                        <small>Inscrit le {{ $registration->created_at->translatedFormat('d F Y H:i') }}</small>
+                    </article>
+                @empty
+                    <p class="empty-admin">Aucune inscription enregistrée.</p>
+                @endforelse
+            </div>
         </section>
         @endif
 

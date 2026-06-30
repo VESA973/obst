@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\ArticleCategory;
 use App\Models\Event;
 use Illuminate\View\View;
 
@@ -31,6 +32,10 @@ class PageController extends Controller
         return view('pages.news', [
             'articles' => Article::where('is_published', true)
                 ->with(['assets', 'categoryModel'])
+                ->where(function ($query): void {
+                    $query->whereHas('categoryModel', fn ($categoryQuery) => $categoryQuery->where('section', 'news'))
+                        ->orWhereDoesntHave('categoryModel');
+                })
                 ->latest('published_at')
                 ->latest()
                 ->get(),
@@ -40,10 +45,50 @@ class PageController extends Controller
     public function article(Article $article): View
     {
         abort_unless($article->is_published, 404);
+        abort_if($article->categoryModel?->section === 'public', 404);
         $article->load(['assets', 'categoryModel']);
 
         return view('pages.article', [
             'article' => $article,
+        ]);
+    }
+
+    public function public(): View
+    {
+        return view('pages.public', [
+            'categories' => ArticleCategory::where('section', 'public')
+                ->withCount(['articles' => fn ($query) => $query->where('is_published', true)])
+                ->orderBy('name')
+                ->get(),
+        ]);
+    }
+
+    public function publicCategory(ArticleCategory $category): View
+    {
+        abort_unless($category->section === 'public', 404);
+
+        return view('pages.public-category', [
+            'category' => $category,
+            'articles' => $category->articles()
+                ->where('is_published', true)
+                ->with('assets')
+                ->latest('published_at')
+                ->latest()
+                ->get(),
+        ]);
+    }
+
+    public function publicArticle(ArticleCategory $category, Article $article): View
+    {
+        abort_unless($category->section === 'public', 404);
+        abort_unless($article->is_published && $article->article_category_id === $category->id, 404);
+
+        $article->load(['assets', 'categoryModel']);
+
+        return view('pages.article', [
+            'article' => $article,
+            'backRoute' => route('public.category', $category),
+            'backLabel' => 'Retour à '.$category->name,
         ]);
     }
 
