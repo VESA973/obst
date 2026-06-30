@@ -35,7 +35,7 @@ Route::post('/professionnels/inscription', [ProfessionalAuthController::class, '
 Route::post('/professionnels/connexion', [ProfessionalAuthController::class, 'login'])->middleware('throttle:5,1')->name('professional.login');
 Route::post('/professionnels/deconnexion', [ProfessionalAuthController::class, 'logout'])->name('professional.logout');
 Route::get('/professionnels/email/verification/{id}/{hash}', [ProfessionalAuthController::class, 'verifyEmail'])
-    ->middleware(['auth', 'signed', 'throttle:6,1'])
+    ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
 Route::get('/professionnels/mot-de-passe-oublie', [ProfessionalAuthController::class, 'forgotPasswordForm'])->name('professional.password.request');
 Route::post('/professionnels/mot-de-passe-oublie', [ProfessionalAuthController::class, 'sendPasswordResetLink'])->middleware('throttle:5,1')->name('professional.password.email');

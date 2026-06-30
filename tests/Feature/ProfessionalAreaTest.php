@@ -10,6 +10,7 @@ use App\Support\SiteMailerConfigurator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class ProfessionalAreaTest extends TestCase
@@ -69,10 +70,61 @@ class ProfessionalAreaTest extends TestCase
 
         $user = User::where('email', 'dr@example.com')->firstOrFail();
 
+        $this->assertGuest();
         $this->assertTrue($user->is_member);
         $this->assertTrue($user->is_health_professional);
         $this->assertNull($user->email_verified_at);
         Notification::assertSentTo($user, ProfessionalVerifyEmailNotification::class);
+    }
+
+    public function test_professional_registration_shows_confirmation_popup(): void
+    {
+        Notification::fake();
+
+        $this->followingRedirects()
+            ->post(route('professional.register'), [
+                'name' => 'Dr Popup',
+                'email' => 'popup@example.com',
+                'password' => 'password-secure',
+                'password_confirmation' => 'password-secure',
+                'is_health_professional' => '1',
+                'form_started_at' => now()->subSeconds(5)->timestamp,
+            ])
+            ->assertOk()
+            ->assertSee('Compte créé')
+            ->assertSee('Confirmez votre email')
+            ->assertSee('Un email de confirmation vient de vous être envoyé');
+    }
+
+    public function test_professional_registration_requires_health_professional_checkbox(): void
+    {
+        $this->post(route('professional.register'), [
+            'name' => 'Dr Missing',
+            'email' => 'missing@example.com',
+            'password' => 'password-secure',
+            'password_confirmation' => 'password-secure',
+            'form_started_at' => now()->subSeconds(5)->timestamp,
+        ])
+            ->assertSessionHasErrors('is_health_professional', null, 'register');
+    }
+
+    public function test_email_verification_link_works_without_authenticated_session(): void
+    {
+        $user = User::factory()->unverified()->create([
+            'is_member' => true,
+            'is_health_professional' => true,
+        ]);
+
+        $url = URL::temporarySignedRoute('verification.verify', now()->addMinutes(60), [
+            'id' => $user->id,
+            'hash' => sha1($user->getEmailForVerification()),
+        ]);
+
+        $this->get($url)
+            ->assertRedirect(route('pro'));
+
+        $this->assertGuest();
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
     }
 
     public function test_unverified_professional_can_request_a_new_verification_email_by_registering_again(): void

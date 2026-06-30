@@ -6,7 +6,7 @@ use App\Models\SiteSetting;
 use App\Models\User;
 use App\Support\SiteMailerConfigurator;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,12 +69,11 @@ class ProfessionalAuthController extends Controller
 
         SiteMailerConfigurator::apply();
         $user->sendEmailVerificationNotification();
-        Auth::login($user);
-        $request->session()->regenerate();
 
         return redirect()
             ->route('pro')
-            ->with('status', 'Votre compte est créé. Confirmez votre email avec le lien reçu pour accéder à l’espace professionnel.');
+            ->with('account_created', true)
+            ->with('status', 'Votre compte est créé. Un email de confirmation vient de vous être envoyé. Confirmez votre email pour accéder à l’espace professionnel.');
     }
 
     public function login(Request $request): RedirectResponse
@@ -115,9 +114,16 @@ class ProfessionalAuthController extends Controller
         return redirect()->intended(route('pro'));
     }
 
-    public function verifyEmail(EmailVerificationRequest $request): RedirectResponse
+    public function verifyEmail(Request $request, int $id, string $hash): RedirectResponse
     {
-        $request->fulfill();
+        $user = User::findOrFail($id);
+
+        abort_unless(hash_equals($hash, sha1($user->getEmailForVerification())), 403);
+
+        if (! $user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+            event(new Verified($user));
+        }
 
         return redirect()
             ->route('pro')

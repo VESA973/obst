@@ -129,6 +129,19 @@
         </dialog>
     @endguest
 
+    @if (session('account_created'))
+        <dialog class="register-modal account-created-modal" open aria-labelledby="account-created-title">
+            <div class="modal-heading">
+                <p class="eyebrow">Compte créé</p>
+                <h2 id="account-created-title">Confirmez votre email</h2>
+                <p>Votre compte professionnel a bien été créé. Un email de confirmation vient de vous être envoyé. Cliquez sur le lien reçu pour activer votre accès à l’espace professionnel.</p>
+            </div>
+            <form method="dialog">
+                <button type="submit">J’ai compris</button>
+            </form>
+        </dialog>
+    @endif
+
     <main>
         @if (session('status'))
             <div class="flash-message">{{ session('status') }}</div>
