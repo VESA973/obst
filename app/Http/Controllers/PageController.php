@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\Event;
+use App\Models\ResourceFile;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -101,6 +103,23 @@ class PageController extends Controller
                 ->orderByRaw('event_date IS NULL')
                 ->orderBy('event_date')
                 ->get(),
+        ]);
+    }
+
+    public function professionalResources(): View|RedirectResponse
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return redirect()->route('pro')->with('status', 'Connectez-vous pour accéder aux ressources.');
+        }
+
+        if ((! $user->is_member && ! $user->is_admin) || ! $user->hasVerifiedEmail()) {
+            return redirect()->route('pro')->with('status', 'Votre compte doit être confirmé pour accéder aux ressources.');
+        }
+
+        return view('pages.pro-resources', [
+            'resources' => ResourceFile::latest()->get(),
         ]);
     }
 }

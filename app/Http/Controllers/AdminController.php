@@ -252,7 +252,7 @@ class AdminController extends Controller
 
         ResourceFile::create($attributes);
 
-        return back()->with('status', 'Fichier ajoute.');
+        return back()->with('status', 'Ressource ajoutée.');
     }
 
     public function destroyFile(ResourceFile $file): RedirectResponse
@@ -260,7 +260,7 @@ class AdminController extends Controller
         Storage::disk('public')->delete($file->path);
         $file->delete();
 
-        return back()->with('status', 'Fichier supprime.');
+        return back()->with('status', 'Ressource supprimée.');
     }
 
     public function storeArticleCategory(Request $request): RedirectResponse

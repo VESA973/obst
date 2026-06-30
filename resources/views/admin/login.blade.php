@@ -8,7 +8,7 @@
         <div>
             <p class="eyebrow">Administration</p>
             <h1>Connexion admin</h1>
-            <p>Accès réservé à la gestion du site, des actualités, des événements, des fichiers et des utilisateurs.</p>
+            <p>Accès réservé à la gestion du site, des actualités, des événements, des ressources et des utilisateurs.</p>
         </div>
 
         <form class="admin-login-form" method="POST" action="{{ route('admin.login.store') }}">

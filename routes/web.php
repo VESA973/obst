@@ -20,6 +20,7 @@ Route::get('/sante-des-femmes', [PageController::class, 'public'])->name('public
 Route::get('/sante-des-femmes/{category:slug}', [PageController::class, 'publicCategory'])->name('public.category');
 Route::get('/sante-des-femmes/{category:slug}/{article:slug}', [PageController::class, 'publicArticle'])->name('public.article');
 Route::view('/espace-pro', 'pages.pro')->name('pro');
+Route::get('/espace-pro/ressources', [PageController::class, 'professionalResources'])->name('pro.resources');
 Route::get('/actualites', [PageController::class, 'news'])->name('news');
 Route::get('/actualites/{article:slug}', [PageController::class, 'article'])->name('articles.show');
 Route::get('/agenda', [PageController::class, 'agenda'])->name('agenda');

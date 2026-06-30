@@ -105,7 +105,7 @@
         <span class="private-label">Réservé pro</span>
         <h2>Ressources pédagogiques</h2>
         <p>Supports d'atelier, fiches patientes, outils de prévention et formats imprimables.</p>
-        <a href="#">Voir les ressources</a>
+        <a href="{{ route('pro.resources') }}">Voir les ressources</a>
     </div>
 </section>
 @endif

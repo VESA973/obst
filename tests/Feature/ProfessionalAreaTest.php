@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ResourceFile;
 use App\Models\User;
 use App\Models\SiteSetting;
 use App\Notifications\ProfessionalResetPasswordNotification;
@@ -37,7 +38,39 @@ class ProfessionalAreaTest extends TestCase
             ->assertOk()
             ->assertSee('Consulter les dossiers')
             ->assertSee('Réservé pro')
+            ->assertSee(route('pro.resources'), false)
             ->assertDontSee('Créer un compte pro');
+    }
+
+    public function test_professional_resources_page_lists_admin_files(): void
+    {
+        $user = User::factory()->create([
+            'is_member' => true,
+            'is_health_professional' => true,
+        ]);
+
+        ResourceFile::create([
+            'title' => 'Guide allaitement',
+            'audience' => 'pro',
+            'category' => 'Fiches pratiques',
+            'description' => 'Support pédagogique pour les équipes.',
+            'path' => 'resources/guide-allaitement.pdf',
+            'original_name' => 'guide-allaitement.pdf',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('pro.resources'))
+            ->assertOk()
+            ->assertSee('Ressources pédagogiques')
+            ->assertSee('Guide allaitement')
+            ->assertSee('Fiches pratiques')
+            ->assertSee('/storage/resources/guide-allaitement.pdf', false);
+    }
+
+    public function test_guest_is_redirected_from_professional_resources_page(): void
+    {
+        $this->get(route('pro.resources'))
+            ->assertRedirect(route('pro'));
     }
 
     public function test_unverified_professional_does_not_see_private_content(): void

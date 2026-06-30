@@ -29,7 +29,7 @@
         <a href="{{ route('admin.pages.index') }}" @class(['active' => $activeSection === 'pages'])><span>02</span> Pages</a>
         <a href="{{ route('admin.articles.index') }}" @class(['active' => $activeSection === 'actualites'])><span>03</span> Gestion des articles</a>
         <a href="{{ route('admin.members.index') }}" @class(['active' => $activeSection === 'membres'])><span>04</span> Membres</a>
-        <a href="{{ route('admin.files.index') }}" @class(['active' => $activeSection === 'fichiers'])><span>05</span> Fichiers</a>
+        <a href="{{ route('admin.files.index') }}" @class(['active' => $activeSection === 'fichiers'])><span>05</span> Ressources</a>
         <a href="{{ route('admin.events.index') }}" @class(['active' => $activeSection === 'agenda'])><span>06</span> Agenda</a>
         <a href="{{ route('admin.registrations.index') }}" @class(['active' => $activeSection === 'inscriptions'])><span>07</span> Inscriptions</a>
         <a href="{{ route('admin.professionals.index') }}" @class(['active' => $activeSection === 'professionnels'])><span>08</span> Professionnels</a>
@@ -58,7 +58,7 @@
             </article>
             <article><span>{{ $articleTotal }}</span><strong>Articles</strong></article>
             <article><span>{{ $members->count() }}</span><strong>Membres</strong></article>
-            <article><span>{{ $files->count() }}</span><strong>Fichiers</strong></article>
+            <article><span>{{ $files->count() }}</span><strong>Ressources</strong></article>
             <article><span>{{ $eventTotal }}</span><strong>Événements</strong></article>
             <article><span>{{ $users->where('is_admin', true)->count() }}</span><strong>Admins</strong></article>
         </section>
@@ -68,7 +68,7 @@
             <a href="{{ route('admin.pages.index') }}"><strong>Pages</strong><span>Menus, entêtes, images</span></a>
             <a href="{{ route('admin.articles.index') }}"><strong>Gestion des articles</strong><span>Articles, catégories, photos</span></a>
             <a href="{{ route('admin.members.index') }}"><strong>Membres</strong><span>Contacts et statuts</span></a>
-            <a href="{{ route('admin.files.index') }}"><strong>Fichiers</strong><span>Ressources publiques et pro</span></a>
+            <a href="{{ route('admin.files.index') }}"><strong>Ressources</strong><span>Documents publics et professionnels</span></a>
             <a href="{{ route('admin.events.index') }}"><strong>Agenda</strong><span>Événements, QR codes, inscriptions</span></a>
             <a href="{{ route('admin.registrations.index') }}"><strong>Inscriptions</strong><span>Participants et export CSV</span></a>
             <a href="{{ route('admin.professionals.index') }}"><strong>Professionnels</strong><span>Comptes, accès et validation email</span></a>
@@ -435,13 +435,13 @@
         @if ($activeSection === 'fichiers')
         <section class="admin-section admin-module" id="fichiers">
             <div class="admin-section-heading">
-                <p class="eyebrow">Fichiers</p>
-                <h2>Mettre des ressources à disposition</h2>
+                <p class="eyebrow">Ressources</p>
+                <h2>Mettre des documents à disposition</h2>
             </div>
 
             <form class="admin-form" method="POST" action="{{ route('admin.files.store') }}" enctype="multipart/form-data">
                 @csrf
-                <input name="title" placeholder="Titre du fichier" required>
+                <input name="title" placeholder="Titre de la ressource" required>
                 <select name="audience" required>
                     <option value="public">Particuliers</option>
                     <option value="pro">Professionnels</option>
@@ -449,7 +449,7 @@
                 <input name="category" placeholder="Catégorie">
                 <textarea name="description" placeholder="Description courte"></textarea>
                 <input name="file" type="file" required>
-                <button type="submit">Ajouter le fichier</button>
+                <button type="submit">Ajouter la ressource</button>
             </form>
 
             <div class="admin-table">
@@ -479,7 +479,7 @@
                         </div>
                     </article>
                 @empty
-                    <p class="empty-admin">Aucun fichier ajouté.</p>
+                    <p class="empty-admin">Aucune ressource ajoutée.</p>
                 @endforelse
             </div>
         </section>
