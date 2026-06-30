@@ -296,6 +296,64 @@ class AdminAuthTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_disable_professional_account(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $professional = User::factory()->create([
+            'is_member' => true,
+            'is_health_professional' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.professionals.update', $professional), [
+                'is_health_professional' => '1',
+                'email_verified' => '1',
+            ])
+            ->assertRedirect();
+
+        $professional->refresh();
+
+        $this->assertFalse($professional->is_member);
+        $this->assertTrue($professional->is_health_professional);
+        $this->assertNotNull($professional->email_verified_at);
+    }
+
+    public function test_admin_can_delete_professional_account(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $professional = User::factory()->create([
+            'is_member' => true,
+            'is_health_professional' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.professionals.destroy', $professional))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $professional->id,
+        ]);
+    }
+
+    public function test_admin_cannot_delete_admin_from_professional_accounts(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $professionalAdmin = User::factory()->create([
+            'is_admin' => true,
+            'is_member' => true,
+            'is_health_professional' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.professionals.destroy', $professionalAdmin))
+            ->assertStatus(422);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $professionalAdmin->id,
+        ]);
+    }
+
     public function test_non_admin_cannot_login_to_admin(): void
     {
         User::factory()->create([

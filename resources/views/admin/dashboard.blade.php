@@ -701,7 +701,7 @@
             <div class="admin-section-heading">
                 <p class="eyebrow">Espace pro</p>
                 <h2>Gérer les comptes professionnels</h2>
-                <p>Activez ou désactivez l'accès à l'espace professionnel et contrôlez la validation email.</p>
+                <p>Activez ou désactivez les comptes, contrôlez la validation email et supprimez les profils inutiles.</p>
             </div>
 
             <div class="admin-list">
@@ -712,11 +712,14 @@
                             @method('PUT')
                             <div>
                                 <strong>{{ $professional->name }}</strong>
-                                <small>{{ $professional->email }}</small>
+                                <small>
+                                    {{ $professional->email }} -
+                                    {{ $professional->is_member ? 'Compte actif' : 'Compte désactivé' }}
+                                </small>
                             </div>
                             <label class="admin-check">
                                 <input name="is_member" type="checkbox" value="1" @checked($professional->is_member)>
-                                Accès espace pro
+                                Compte actif / accès espace pro
                             </label>
                             <label class="admin-check">
                                 <input name="is_health_professional" type="checkbox" value="1" @checked($professional->is_health_professional)>
@@ -727,6 +730,11 @@
                                 Email confirmé
                             </label>
                             <button type="submit">Mettre à jour</button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.professionals.destroy', $professional) }}" onsubmit="return confirm('Supprimer définitivement ce compte professionnel ?');">
+                            @csrf
+                            @method('DELETE')
+                            <button class="danger-button" type="submit">Supprimer le compte</button>
                         </form>
                     </article>
                 @empty

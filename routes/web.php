@@ -67,6 +67,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/inscriptions', [AdminController::class, 'registrations'])->name('registrations.index');
     Route::get('/professionnels', [AdminController::class, 'professionals'])->name('professionals.index');
     Route::put('/professionnels/{user}', [AdminController::class, 'updateProfessional'])->name('professionals.update');
+    Route::delete('/professionnels/{user}', [AdminController::class, 'destroyProfessional'])->name('professionals.destroy');
     Route::get('/membres', [AdminController::class, 'members'])->name('members.index');
     Route::post('/membres', [AdminController::class, 'storeMember'])->name('members.store');
     Route::put('/membres/{member}', [AdminController::class, 'updateMember'])->name('members.update');

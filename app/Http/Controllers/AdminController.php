@@ -490,7 +490,7 @@ class AdminController extends Controller
 
     public function updateProfessional(Request $request, User $user): RedirectResponse
     {
-        $attributes = $request->validate([
+        $request->validate([
             'is_member' => ['nullable', 'boolean'],
             'is_health_professional' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean'],
@@ -503,6 +503,16 @@ class AdminController extends Controller
         ])->save();
 
         return back()->with('status', 'Compte professionnel mis à jour.');
+    }
+
+    public function destroyProfessional(Request $request, User $user): RedirectResponse
+    {
+        abort_if($request->user()->is($user), 422, 'Vous ne pouvez pas supprimer votre propre compte.');
+        abort_if($user->is_admin, 422, 'Un administrateur ne peut pas être supprimé depuis les comptes professionnels.');
+
+        $user->delete();
+
+        return back()->with('status', 'Compte professionnel supprimé.');
     }
 
     private function eventAttributes(Request $request): array
