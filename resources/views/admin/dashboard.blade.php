@@ -27,7 +27,7 @@
         <a href="{{ route('admin.home') }}" @class(['active' => $activeSection === 'dashboard'])><span>00</span> Tableau de bord</a>
         <a href="{{ route('admin.configuration') }}" @class(['active' => $activeSection === 'configuration'])><span>01</span> Configuration</a>
         <a href="{{ route('admin.pages.index') }}" @class(['active' => $activeSection === 'pages'])><span>02</span> Pages</a>
-        <a href="{{ route('admin.articles.index') }}" @class(['active' => $activeSection === 'actualites'])><span>03</span> Actualités</a>
+        <a href="{{ route('admin.articles.index') }}" @class(['active' => $activeSection === 'actualites'])><span>03</span> Gestion des articles</a>
         <a href="{{ route('admin.members.index') }}" @class(['active' => $activeSection === 'membres'])><span>04</span> Membres</a>
         <a href="{{ route('admin.files.index') }}" @class(['active' => $activeSection === 'fichiers'])><span>05</span> Fichiers</a>
         <a href="{{ route('admin.events.index') }}" @class(['active' => $activeSection === 'agenda'])><span>06</span> Agenda</a>
@@ -55,7 +55,7 @@
                 <span>{{ $settings['maintenance_enabled'] === '1' ? 'ON' : 'OK' }}</span>
                 <strong>{{ $settings['maintenance_enabled'] === '1' ? 'Maintenance' : 'Site en ligne' }}</strong>
             </article>
-            <article><span>{{ $articleTotal }}</span><strong>Actualités</strong></article>
+            <article><span>{{ $articleTotal }}</span><strong>Articles</strong></article>
             <article><span>{{ $members->count() }}</span><strong>Membres</strong></article>
             <article><span>{{ $files->count() }}</span><strong>Fichiers</strong></article>
             <article><span>{{ $eventTotal }}</span><strong>Événements</strong></article>
@@ -65,7 +65,7 @@
         <section class="module-grid" aria-label="Modules administration">
             <a href="{{ route('admin.configuration') }}"><strong>Configuration</strong><span>Maintenance, note interne</span></a>
             <a href="{{ route('admin.pages.index') }}"><strong>Pages</strong><span>Menus, entêtes, images</span></a>
-            <a href="{{ route('admin.articles.index') }}"><strong>Actualités</strong><span>Articles, catégories, photos</span></a>
+            <a href="{{ route('admin.articles.index') }}"><strong>Gestion des articles</strong><span>Articles, catégories, photos</span></a>
             <a href="{{ route('admin.members.index') }}"><strong>Membres</strong><span>Contacts et statuts</span></a>
             <a href="{{ route('admin.files.index') }}"><strong>Fichiers</strong><span>Ressources publiques et pro</span></a>
             <a href="{{ route('admin.events.index') }}"><strong>Agenda</strong><span>Événements, QR codes, inscriptions</span></a>
@@ -186,13 +186,13 @@
         @if ($activeSection === 'actualites')
         <section class="admin-section admin-module" id="actualites">
             <div class="admin-section-heading">
-                <p class="eyebrow">Actualités</p>
-                <h2>Piloter les articles et liens externes</h2>
-                <p>Ajoutez vos propres articles ou relayez une publication d'un autre site avec son lien source.</p>
+                <p class="eyebrow">Gestion des articles</p>
+                <h2>Piloter les articles, catégories et contenus Santé</h2>
+                <p>Ajoutez vos articles, créez des catégories et choisissez si elles alimentent les actualités ou la page Santé de la femme.</p>
             </div>
 
             <div class="category-manager">
-                <form class="category-form" method="POST" action="{{ route('admin.article-categories.store') }}">
+                <form class="category-form" method="POST" action="{{ route('admin.article-categories.store') }}" enctype="multipart/form-data">
                     @csrf
                     <input name="name" placeholder="Nom de la catégorie" required>
                     <input name="title" placeholder="Titre affiché">
@@ -200,6 +200,10 @@
                         <option value="news">Actualités</option>
                         <option value="public">Santé de la femme</option>
                     </select>
+                    <label>
+                        Image d'illustration
+                        <input name="image" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*">
+                    </label>
                     <textarea name="description" placeholder="Description de la catégorie"></textarea>
                     <button type="submit">Ajouter la catégorie</button>
                 </form>
@@ -209,7 +213,7 @@
                             <summary>
                                 <span>{{ $category->name }} - {{ $category->section === 'public' ? 'Santé de la femme' : 'Actualités' }} - {{ $category->articles_count }} article(s)</span>
                             </summary>
-                            <form class="category-form" method="POST" action="{{ route('admin.article-categories.update', $category) }}">
+                            <form class="category-form" method="POST" action="{{ route('admin.article-categories.update', $category) }}" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <input name="name" value="{{ $category->name }}" required>
@@ -218,7 +222,14 @@
                                     <option value="news" @selected($category->section === 'news')>Actualités</option>
                                     <option value="public" @selected($category->section === 'public')>Santé de la femme</option>
                                 </select>
+                                <label>
+                                    Image d'illustration
+                                    <input name="image" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*">
+                                </label>
                                 <textarea name="description" placeholder="Description">{{ $category->description }}</textarea>
+                                @if ($category->image_path)
+                                    <a class="admin-current-image" href="{{ Storage::url($category->image_path) }}" target="_blank" rel="noreferrer">Voir l'image actuelle</a>
+                                @endif
                                 <button type="submit">Mettre à jour</button>
                             </form>
                             <form method="POST" action="{{ route('admin.article-categories.destroy', $category) }}">

@@ -118,6 +118,7 @@ class ArticlePublishingTest extends TestCase
 
     public function test_public_health_category_lists_its_articles(): void
     {
+        Storage::fake('public');
         $admin = User::factory()->create(['is_admin' => true]);
 
         $this->actingAs($admin)
@@ -126,10 +127,12 @@ class ArticlePublishingTest extends TestCase
                 'section' => 'public',
                 'title' => 'Comprendre l’endométriose',
                 'description' => 'Articles et repères sur le parcours de soin.',
+                'image' => UploadedFile::fake()->create('endometriose.png', 10, 'image/png'),
             ])
             ->assertRedirect();
 
         $category = \App\Models\ArticleCategory::where('name', 'Endométriose')->firstOrFail();
+        Storage::disk('public')->assertExists($category->image_path);
 
         $this->actingAs($admin)
             ->post(route('admin.articles.store'), [
@@ -141,6 +144,8 @@ class ArticlePublishingTest extends TestCase
 
         $this->get(route('public'))
             ->assertOk()
+            ->assertSee('health-category-card')
+            ->assertSee('article-categories/', false)
             ->assertSee('Comprendre l’endométriose')
             ->assertSee(route('public.category', $category));
 

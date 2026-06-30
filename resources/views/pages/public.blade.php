@@ -5,21 +5,28 @@
 @section('content')
 <x-page-hero page-key="public" class="public-hero" />
 
-<section class="resource-grid">
+<section class="health-category-grid">
     @forelse ($categories as $category)
-        <article>
-            <span>{{ $category->articles_count }} article(s)</span>
-            <h2>{{ $category->title ?: $category->name }}</h2>
-            <p>{{ $category->description ?: 'Retrouvez les articles et ressources associés à ce thème.' }}</p>
-            <a href="{{ route('public.category', $category) }}">Voir les articles</a>
+        <article class="health-category-card">
+            <a href="{{ route('public.category', $category) }}">
+                <span class="health-category-media">
+                    @if ($category->image_path)
+                        <img src="{{ Storage::url($category->image_path) }}" alt="">
+                    @else
+                        <span>{{ Str::substr($category->name, 0, 1) }}</span>
+                    @endif
+                </span>
+                <span class="health-category-content">
+                    <small>{{ $category->articles_count }} article(s)</small>
+                    <strong>{{ $category->title ?: $category->name }}</strong>
+                    <span>{{ $category->description ?: 'Retrouvez les articles et ressources associés à ce thème.' }}</span>
+                </span>
+            </a>
         </article>
     @empty
-        <article><span>Cycle de vie</span><h2>Puberté</h2><p>Comprendre les changements du corps, les règles, l'hygiène et les premiers repères de santé.</p></article>
-        <article><span>Projet parental</span><h2>Fertilité</h2><p>Questions fréquentes, délais, examens possibles et orientation vers les professionnels.</p></article>
-        <article><span>Périnatalité</span><h2>Grossesse</h2><p>Suivi, examens, signes d'alerte et sujets à aborder avec l'équipe soignante.</p></article>
-        <article><span>Après naissance</span><h2>Post-partum</h2><p>Récupération, allaitement, fatigue, douleur, soutien psychique et relais d'aide.</p></article>
-        <article><span>Douleurs</span><h2>Endométriose</h2><p>Symptômes, parcours diagnostique, traitements et accompagnement au quotidien.</p></article>
-        <article><span>Gynécologie</span><h2>Fibromes</h2><p>Comprendre les signes, les examens et les options de prise en charge.</p></article>
+        <article class="health-category-card"><a href="#"><span class="health-category-media"><span>P</span></span><span class="health-category-content"><small>Cycle de vie</small><strong>Puberté</strong><span>Comprendre les changements du corps et les premiers repères de santé.</span></span></a></article>
+        <article class="health-category-card"><a href="#"><span class="health-category-media"><span>F</span></span><span class="health-category-content"><small>Projet parental</small><strong>Fertilité</strong><span>Questions fréquentes, délais, examens possibles et orientation.</span></span></a></article>
+        <article class="health-category-card"><a href="#"><span class="health-category-media"><span>G</span></span><span class="health-category-content"><small>Périnatalité</small><strong>Grossesse</strong><span>Suivi, examens, signes d'alerte et sujets à aborder.</span></span></a></article>
     @endforelse
 </section>
 @endsection

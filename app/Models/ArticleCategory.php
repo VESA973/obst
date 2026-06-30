@@ -16,6 +16,7 @@ class ArticleCategory extends Model
         'section',
         'title',
         'description',
+        'image_path',
     ];
 
     public function articles(): HasMany

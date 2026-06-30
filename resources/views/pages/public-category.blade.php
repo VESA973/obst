@@ -3,7 +3,8 @@
 @section('title', ($category->title ?: $category->name).' | Santé de la femme')
 
 @section('content')
-<section class="page-hero compact">
+@php($categoryImage = $category->image_path ? Storage::url($category->image_path) : null)
+<section class="page-hero compact health-category-hero{{ $categoryImage ? ' has-hero-image' : '' }}" @if ($categoryImage) style="--page-hero-image: url('{{ $categoryImage }}')" @endif>
     <p class="eyebrow">Santé de la femme</p>
     <h1>{{ $category->title ?: $category->name }}</h1>
     @if ($category->description)

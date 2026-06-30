@@ -252,7 +252,12 @@ class AdminController extends Controller
             'section' => ['nullable', Rule::in(['news', 'public'])],
             'title' => ['nullable', 'string', 'max:180'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,svg', 'max:20480'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $attributes['image_path'] = $request->file('image')->store('article-categories', 'public');
+        }
 
         ArticleCategory::create([
             'name' => $attributes['name'],
@@ -260,6 +265,7 @@ class AdminController extends Controller
             'section' => $attributes['section'] ?? 'news',
             'title' => $attributes['title'] ?? $attributes['name'],
             'description' => $attributes['description'] ?? null,
+            'image_path' => $attributes['image_path'] ?? null,
         ]);
 
         return back()->with('status', 'Catégorie ajoutée.');
@@ -272,11 +278,22 @@ class AdminController extends Controller
             'section' => ['required', Rule::in(['news', 'public'])],
             'title' => ['nullable', 'string', 'max:180'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,svg', 'max:20480'],
         ]);
 
         if ($category->name !== $attributes['name']) {
             $attributes['slug'] = $this->uniqueCategorySlug($attributes['name']);
         }
+
+        if ($request->hasFile('image')) {
+            if ($category->image_path) {
+                Storage::disk('public')->delete($category->image_path);
+            }
+
+            $attributes['image_path'] = $request->file('image')->store('article-categories', 'public');
+        }
+
+        unset($attributes['image']);
 
         $category->update($attributes);
 
@@ -285,6 +302,10 @@ class AdminController extends Controller
 
     public function destroyArticleCategory(ArticleCategory $category): RedirectResponse
     {
+        if ($category->image_path) {
+            Storage::disk('public')->delete($category->image_path);
+        }
+
         $category->delete();
 
         return back()->with('status', 'Catégorie supprimée.');
