@@ -14,7 +14,7 @@
 <input name="antibot_token" type="hidden" value="{{ $challenge['token'] }}">
 
 <label class="captcha-field" for="{{ $fieldId }}">
-    <span>Vérification anti-robot : {{ $challenge['question'] }}</span>
+    <span>Question rapide : {{ $challenge['question'] }}</span>
     <input id="{{ $fieldId }}" name="antibot_answer" type="text" inputmode="numeric" autocomplete="off" required>
 </label>
 

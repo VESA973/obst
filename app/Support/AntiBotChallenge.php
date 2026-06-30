@@ -10,8 +10,8 @@ class AntiBotChallenge
 {
     public static function make(string $key): array
     {
-        $left = random_int(2, 9);
-        $right = random_int(1, 9);
+        $left = random_int(1, 5);
+        $right = random_int(1, 4);
         $token = Str::random(40);
 
         session()->put(self::sessionKey($key, $token), [
@@ -31,7 +31,7 @@ class AntiBotChallenge
         $errors = [];
 
         if ($request->filled('website')) {
-            $errors['website'] = 'Le formulaire anti-robot est invalide.';
+            $errors['website'] = 'Le formulaire est invalide.';
         }
 
         $token = (string) $request->input('antibot_token', '');
@@ -39,7 +39,7 @@ class AntiBotChallenge
         $challenge = $token !== '' ? $request->session()->pull(self::sessionKey($key, $token)) : null;
 
         if (! is_array($challenge) || $answer === '' || $answer !== (string) $challenge['answer']) {
-            $errors['antibot_answer'] = 'Réponse anti-robot incorrecte. Rechargez la page puis réessayez.';
+            $errors['antibot_answer'] = 'Réponse incorrecte. Rechargez la page puis réessayez.';
         }
 
         $startedAt = (int) $request->input('form_started_at', 0);
