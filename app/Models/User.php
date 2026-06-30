@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\ProfessionalResetPasswordNotification;
+use App\Notifications\ProfessionalVerifyEmailNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -52,5 +54,15 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_member' => 'boolean',
             'is_health_professional' => 'boolean',
         ];
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new ProfessionalVerifyEmailNotification());
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ProfessionalResetPasswordNotification($token));
     }
 }

@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\SiteSetting;
+use App\Notifications\ProfessionalResetPasswordNotification;
+use App\Notifications\ProfessionalVerifyEmailNotification;
 use App\Support\SiteMailerConfigurator;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Config;
@@ -72,7 +72,7 @@ class ProfessionalAreaTest extends TestCase
         $this->assertTrue($user->is_member);
         $this->assertTrue($user->is_health_professional);
         $this->assertNull($user->email_verified_at);
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertSentTo($user, ProfessionalVerifyEmailNotification::class);
     }
 
     public function test_unverified_professional_can_request_a_new_verification_email_by_registering_again(): void
@@ -95,7 +95,7 @@ class ProfessionalAreaTest extends TestCase
             ->assertRedirect(route('pro'));
 
         $user = User::where('email', 'retry@example.com')->firstOrFail();
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertSentTo($user, ProfessionalVerifyEmailNotification::class);
         $this->assertSame('Dr Retry', $user->name);
     }
 
@@ -141,6 +141,6 @@ class ProfessionalAreaTest extends TestCase
             'email' => 'pro@example.com',
         ])->assertSessionHasNoErrors();
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, ProfessionalResetPasswordNotification::class);
     }
 }
