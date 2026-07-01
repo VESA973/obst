@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Support\AntiBotChallenge;
+use App\Support\GoogleOAuthConfigurator;
 use App\Support\SiteMailerConfigurator;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
@@ -183,11 +184,7 @@ class ProfessionalAuthController extends Controller
             return redirect()->route('pro')->with('status', 'La connexion Google nécessite le package laravel/socialite sur le serveur.');
         }
 
-        config([
-            'services.google.client_id' => SiteSetting::getValue('google_client_id'),
-            'services.google.client_secret' => SiteSetting::getValue('google_client_secret'),
-            'services.google.redirect' => route('professional.google.callback'),
-        ]);
+        GoogleOAuthConfigurator::apply();
 
         return \Laravel\Socialite\Facades\Socialite::driver('google')->redirect();
     }
@@ -198,11 +195,7 @@ class ProfessionalAuthController extends Controller
             return redirect()->route('pro')->with('status', 'La connexion Google nécessite le package laravel/socialite sur le serveur.');
         }
 
-        config([
-            'services.google.client_id' => SiteSetting::getValue('google_client_id'),
-            'services.google.client_secret' => SiteSetting::getValue('google_client_secret'),
-            'services.google.redirect' => route('professional.google.callback'),
-        ]);
+        GoogleOAuthConfigurator::apply();
 
         $googleUser = \Laravel\Socialite\Facades\Socialite::driver('google')->user();
 

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\SiteSetting;
 use App\Notifications\ProfessionalResetPasswordNotification;
 use App\Notifications\ProfessionalVerifyEmailNotification;
+use App\Support\GoogleOAuthConfigurator;
 use App\Support\SiteMailerConfigurator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -215,6 +216,23 @@ class ProfessionalAreaTest extends TestCase
         $this->assertSame('smtps', Config::get('mail.mailers.smtp.scheme'));
         $this->assertSame('smtp.example.com', Config::get('mail.mailers.smtp.host'));
         $this->assertSame(465, Config::get('mail.mailers.smtp.port'));
+    }
+
+    public function test_google_oauth_redirect_uri_uses_app_url(): void
+    {
+        config(['app.url' => 'https://laquinzaineobstetricale.fr']);
+
+        SiteSetting::setValue('google_client_id', 'client-id');
+        SiteSetting::setValue('google_client_secret', 'client-secret');
+
+        GoogleOAuthConfigurator::apply();
+
+        $this->assertSame('client-id', Config::get('services.google.client_id'));
+        $this->assertSame('client-secret', Config::get('services.google.client_secret'));
+        $this->assertSame(
+            'https://laquinzaineobstetricale.fr/professionnels/google/retour',
+            Config::get('services.google.redirect')
+        );
     }
 
     public function test_professional_registration_rejects_honeypot(): void

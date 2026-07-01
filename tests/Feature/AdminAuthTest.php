@@ -92,6 +92,20 @@ class AdminAuthTest extends TestCase
             ->assertDontSee("L'association");
     }
 
+    public function test_admin_google_redirect_uri_uses_app_url(): void
+    {
+        config(['app.url' => 'https://laquinzaineobstetricale.fr']);
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.configuration'))
+            ->assertOk()
+            ->assertSee('https://laquinzaineobstetricale.fr/professionnels/google/retour', false);
+    }
+
     public function test_public_navigation_uses_association_submenu_and_hides_search(): void
     {
         $this->get(route('home'))

@@ -13,6 +13,7 @@ use App\Models\PageSetting;
 use App\Models\ResourceFile;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Support\GoogleOAuthConfigurator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -117,7 +118,7 @@ class AdminController extends Controller
                 'smtp_from_name' => SiteSetting::getValue('smtp_from_name', 'La Quinzaine Obstétricale'),
                 'google_login_enabled' => SiteSetting::getValue('google_login_enabled', '0'),
                 'google_client_id' => SiteSetting::getValue('google_client_id', ''),
-                'google_redirect_uri' => route('professional.google.callback'),
+                'google_redirect_uri' => GoogleOAuthConfigurator::redirectUri(),
             ],
         ]);
     }
