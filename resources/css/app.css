@@ -2702,9 +2702,121 @@ h3 {
     max-width: 680px;
 }
 
+.footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    align-items: center;
+}
+
+.footer-legal a {
+    color: #f4ddff;
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.footer-legal a:hover,
+.footer-legal a:focus-visible {
+    color: var(--white);
+    text-decoration: underline;
+}
+
 .site-footer p {
     margin-bottom: 0;
     color: #e8d2f2;
+}
+
+.legal-hero {
+    border-bottom: 1px solid var(--line);
+}
+
+.legal-page {
+    display: grid;
+    gap: 26px;
+    max-width: 960px;
+    padding: clamp(44px, 7vw, 80px) clamp(20px, 5vw, 76px);
+}
+
+.legal-page section {
+    display: grid;
+    gap: 10px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 24px;
+}
+
+.legal-page section:last-child {
+    border-bottom: 0;
+}
+
+.legal-page h2 {
+    font-size: clamp(1.35rem, 2vw, 1.9rem);
+}
+
+.legal-page p,
+.legal-page li {
+    color: var(--muted);
+    line-height: 1.72;
+}
+
+.legal-page ul {
+    display: grid;
+    gap: 8px;
+    padding-left: 22px;
+}
+
+.cookie-banner {
+    position: fixed;
+    right: clamp(16px, 4vw, 36px);
+    bottom: clamp(16px, 4vw, 36px);
+    z-index: 40;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+    width: min(720px, calc(100% - 32px));
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+    background: var(--white);
+    box-shadow: 0 20px 70px rgba(20, 50, 56, 0.22);
+}
+
+.cookie-banner[hidden] {
+    display: none;
+}
+
+.cookie-banner p {
+    margin: 4px 0 8px;
+    color: var(--muted);
+}
+
+.cookie-banner a {
+    color: var(--deep-teal);
+    font-weight: 850;
+    text-decoration: none;
+}
+
+.cookie-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.cookie-actions button {
+    min-height: 42px;
+    border: 1px solid var(--deep-teal);
+    border-radius: 999px;
+    padding: 0 16px;
+    color: var(--deep-teal);
+    background: var(--white);
+    font: inherit;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.cookie-actions button:last-child {
+    color: var(--white);
+    background: var(--deep-teal);
 }
 
 @media (max-width: 980px) {
@@ -2773,6 +2885,7 @@ h3 {
     .schedule-fields > div,
     .document-fields > div,
     .resource-card,
+    .cookie-banner,
     .pro-auth-modal-grid {
         grid-template-columns: 1fr;
     }
@@ -2903,5 +3016,18 @@ h3 {
 
     .site-footer {
         padding-bottom: 36px;
+    }
+
+    .footer-legal,
+    .cookie-actions {
+        width: 100%;
+    }
+
+    .cookie-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cookie-actions button {
+        width: 100%;
     }
 }

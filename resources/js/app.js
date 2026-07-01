@@ -82,3 +82,20 @@ document.querySelectorAll('[data-site-search]').forEach((search) => {
         }
     });
 });
+
+const cookieBanner = document.querySelector('[data-cookie-banner]');
+
+if (cookieBanner instanceof HTMLElement) {
+    const storageKey = 'quinzaine_cookie_choice';
+
+    if (!localStorage.getItem(storageKey)) {
+        cookieBanner.hidden = false;
+    }
+
+    cookieBanner.querySelectorAll('[data-cookie-choice]').forEach((button) => {
+        button.addEventListener('click', () => {
+            localStorage.setItem(storageKey, button.dataset.cookieChoice || 'refused');
+            cookieBanner.hidden = true;
+        });
+    });
+}

@@ -157,7 +157,25 @@
             <strong>La Quinzaine Obstétricale</strong>
             <p>Association guyanaise dédiée à la santé de la femme, à la périnatalité, à la prévention et à la transmission.</p>
         </div>
+        <nav class="footer-legal" aria-label="Liens légaux">
+            <a href="{{ route('legal.mentions') }}">Mentions légales</a>
+            <a href="{{ route('legal.privacy') }}">Confidentialité</a>
+            <a href="{{ route('legal.cookies') }}">Cookies</a>
+            <a href="{{ route('legal.terms') }}">CGU</a>
+        </nav>
         <a class="footer-don" href="{{ route('join') }}">Nous soutenir</a>
     </footer>
+
+    <div class="cookie-banner" data-cookie-banner hidden>
+        <div>
+            <strong>Préférences cookies</strong>
+            <p>Nous utilisons les cookies nécessaires au fonctionnement du site. Vous pouvez accepter ou refuser les cookies non essentiels.</p>
+            <a href="{{ route('legal.cookies') }}">En savoir plus</a>
+        </div>
+        <div class="cookie-actions">
+            <button type="button" data-cookie-choice="refused">Refuser</button>
+            <button type="button" data-cookie-choice="accepted">Accepter</button>
+        </div>
+    </div>
 </body>
 </html>
