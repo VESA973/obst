@@ -39,9 +39,8 @@ class MaintenanceModeTest extends TestCase
         SiteSetting::setValue('maintenance_enabled', '1');
         SiteSetting::setValue('maintenance_message', 'Maintenance en cours.');
 
-        $this->get(route('admin.login'))
-            ->assertOk()
-            ->assertSee('Connexion admin');
+        $this->get(route('filament.admin.auth.login'))
+            ->assertOk();
     }
 
     public function test_admin_can_access_site_when_maintenance_is_enabled(): void

@@ -99,3 +99,4 @@ if (cookieBanner instanceof HTMLElement) {
         });
     });
 }
+import './news';

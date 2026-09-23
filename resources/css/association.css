@@ -1,0 +1,527 @@
+/*
+ * Page « L'association ». S'appuie sur resources/css/home.css (sections, titres, vagues, motifs).
+ * Couleurs : UNIQUEMENT les variables existantes du site, avec des nuances (opacités, color-mix).
+ */
+
+/* ---------- Images (emplacements Filament) et visuel de remplacement ---------- */
+
+.assoc-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.assoc-img--placeholder {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--gold) 70%, transparent), transparent 55%),
+        linear-gradient(135deg, var(--sage), color-mix(in srgb, var(--teal) 22%, var(--sage)));
+}
+
+.assoc-img-leaf {
+    position: absolute;
+    right: -8%;
+    bottom: -10%;
+    width: 70%;
+    max-width: 360px;
+    color: var(--white);
+    opacity: 0.55;
+}
+
+/* ---------- Hero ---------- */
+
+.assoc-hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    min-height: clamp(420px, 62vh, 640px);
+    padding-block: clamp(48px, 7vw, 88px) clamp(96px, 11vw, 150px);
+    overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+    .assoc-hero {
+        padding-top: calc(var(--home-header-h) + 24px);
+    }
+}
+
+.assoc-hero-img {
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    animation: home-hero-zoom 26s ease-out both;
+}
+
+/* Même principe que l'accueil : voile clair à gauche pour la lecture, photo visible à droite. */
+.assoc-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--mint) 85%, transparent) 0%, transparent 35%),
+        linear-gradient(90deg, rgba(255, 248, 255, 0.96) 0%, rgba(255, 248, 255, 0.84) 45%, rgba(255, 248, 255, 0.3) 100%);
+}
+
+.assoc-hero-content {
+    position: relative;
+}
+
+.assoc-hero-content > * {
+    max-width: 720px;
+}
+
+/* Taille du titre réglable dans « Pages du site » (petit / normal / grand). */
+.assoc-hero h1.assoc-title-small {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.assoc-hero h1.assoc-title-normal {
+    font-size: clamp(2.6rem, 6vw, 5rem);
+}
+
+.assoc-hero h1.assoc-title-large {
+    font-size: clamp(3rem, 8vw, 6.5rem);
+}
+
+.assoc-breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 22px;
+    padding: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    list-style: none;
+}
+
+.assoc-breadcrumb li + li::before {
+    content: '›';
+    margin-right: 8px;
+    color: var(--coral);
+}
+
+.assoc-breadcrumb a {
+    color: var(--deep-teal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ---------- Blocs texte + image (asymétriques) ---------- */
+
+.assoc-split-grid {
+    display: grid;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: center;
+}
+
+@media (min-width: 900px) {
+    .assoc-split-grid {
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    }
+
+    .assoc-split--reverse .assoc-split-grid {
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    }
+}
+
+.assoc-split-text h2 {
+    margin-bottom: 0;
+}
+
+.assoc-split-text .home-link-arrow {
+    margin-top: 18px;
+}
+
+.assoc-split-media {
+    position: relative;
+    margin: 0;
+}
+
+/* Image arrondie, légèrement décalée, avec un aplat teinté derrière (asymétrie). */
+.assoc-split-media::before {
+    content: '';
+    position: absolute;
+    inset: 18px -18px -18px 18px;
+    z-index: -1;
+    border-radius: 32px;
+    background: color-mix(in srgb, var(--coral) 14%, var(--sage));
+}
+
+.assoc-split--reverse .assoc-split-media::before {
+    inset: 18px 18px -18px -18px;
+}
+
+.assoc-split-media > .assoc-img {
+    aspect-ratio: 4 / 3;
+    height: auto;
+    border-radius: 32px;
+    box-shadow: var(--home-shadow-md);
+    transition: transform 600ms ease;
+}
+
+.assoc-split-media:hover > .assoc-img {
+    transform: scale(1.015);
+}
+
+.assoc-split-media figcaption {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.assoc-years-badge {
+    position: absolute;
+    right: clamp(-10px, -1vw, 0px);
+    bottom: -22px;
+    display: grid;
+    gap: 2px;
+    padding: 16px 22px;
+    border-radius: 22px;
+    color: var(--white);
+    text-align: center;
+    background: var(--deep-teal);
+    box-shadow: var(--home-shadow-md);
+}
+
+.assoc-years-badge span {
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.assoc-years-badge strong {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2.2rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+/* ---------- Missions ---------- */
+
+.assoc-values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 18px;
+}
+
+.assoc-value {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: var(--home-radius);
+    background: var(--white);
+    box-shadow: var(--home-shadow-sm);
+    transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+}
+
+.assoc-value:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--teal) 30%, var(--line));
+    box-shadow: var(--home-shadow-md);
+}
+
+.assoc-value-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.assoc-value-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    color: var(--teal);
+    background: var(--mint);
+    transition: background 250ms ease, color 250ms ease;
+}
+
+.assoc-value-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.assoc-value:hover .assoc-value-icon {
+    color: var(--white);
+    background: var(--teal);
+}
+
+.assoc-value-number {
+    color: color-mix(in srgb, var(--coral) 45%, var(--line));
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.assoc-value h3 {
+    margin: 4px 0 0;
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.assoc-value p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* ---------- Chiffres clés ---------- */
+
+.assoc-stats {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(44px, 6vw, 72px);
+    overflow: hidden;
+    color: var(--white);
+    background: linear-gradient(120deg, var(--deep-teal), var(--teal) 60%, color-mix(in srgb, var(--coral) 70%, var(--teal)));
+}
+
+.assoc-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+    gap: 28px;
+}
+
+.assoc-stat {
+    display: grid;
+    gap: 6px;
+    text-align: center;
+}
+
+.assoc-stat strong {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.6rem, 5vw, 3.6rem);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.assoc-stat > span {
+    font-weight: 700;
+    opacity: 0.92;
+}
+
+/* ---------- Frise chronologique ---------- */
+
+.assoc-timeline {
+    position: relative;
+    display: grid;
+    gap: 24px;
+    margin: clamp(48px, 6vw, 72px) 0 0;
+    padding: 0 0 0 32px;
+    list-style: none;
+}
+
+/* Ligne verticale (mobile) / centrale (ordinateur). */
+.assoc-timeline::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 9px;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(var(--teal), var(--coral));
+}
+
+.assoc-timeline-step {
+    position: relative;
+}
+
+.assoc-timeline-dot {
+    position: absolute;
+    top: 22px;
+    left: -30px;
+    width: 18px;
+    height: 18px;
+    border: 4px solid var(--white);
+    border-radius: 999px;
+    background: var(--coral-dark);
+    box-shadow: 0 0 0 2px var(--coral-dark);
+}
+
+.assoc-timeline-card {
+    padding: 20px 22px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: var(--home-shadow-sm);
+}
+
+.assoc-timeline-year {
+    margin: 0 0 4px;
+    color: var(--coral-dark);
+    font-weight: 900;
+}
+
+.assoc-timeline-card h3 {
+    margin: 0 0 6px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 500;
+}
+
+.assoc-timeline-card p:last-child {
+    margin: 0;
+    color: var(--muted);
+}
+
+@media (min-width: 900px) {
+    .assoc-timeline {
+        padding-left: 0;
+    }
+
+    .assoc-timeline::before {
+        left: calc(50% - 1.5px);
+    }
+
+    .assoc-timeline-step {
+        width: calc(50% - 36px);
+    }
+
+    /* Étapes alternées de part et d'autre de la ligne. */
+    .assoc-timeline-step:nth-child(even) {
+        margin-left: calc(50% + 36px);
+    }
+
+    .assoc-timeline-step:nth-child(odd) .assoc-timeline-dot {
+        left: auto;
+        right: -46px;
+    }
+
+    .assoc-timeline-step:nth-child(even) .assoc-timeline-dot {
+        left: -46px;
+    }
+}
+
+/* ---------- Galerie ---------- */
+
+.assoc-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: dense;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+@media (min-width: 900px) {
+    .assoc-gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+/* Une photo sur cinq occupe deux colonnes : rythme façon mosaïque. */
+.assoc-gallery-item--wide {
+    grid-column: span 2;
+}
+
+.assoc-gallery-link {
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--sage);
+}
+
+.assoc-gallery-item--wide .assoc-gallery-link {
+    aspect-ratio: 16 / 9;
+}
+
+.assoc-gallery-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms ease;
+}
+
+.assoc-gallery-link:hover img {
+    transform: scale(1.05);
+}
+
+.assoc-gallery-link:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: 3px;
+}
+
+.assoc-gallery-caption {
+    margin: 8px 2px 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+/* ---------- Bandeau final d'engagement ---------- */
+
+.assoc-cta {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(56px, 8vw, 96px);
+    overflow: hidden;
+    color: var(--white);
+    background: linear-gradient(120deg, var(--deep-teal), color-mix(in srgb, var(--coral-dark) 80%, var(--deep-teal)));
+}
+
+.assoc-cta-leaf {
+    position: absolute;
+    right: -40px;
+    bottom: -40px;
+    z-index: -1;
+    width: clamp(220px, 30vw, 420px);
+    color: var(--white);
+    opacity: 0.1;
+}
+
+.assoc-cta-inner {
+    display: grid;
+    gap: 28px;
+    align-items: center;
+}
+
+@media (min-width: 900px) {
+    .assoc-cta-inner {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    }
+}
+
+.assoc-cta h2 {
+    margin: 0;
+    color: var(--white);
+}
+
+.assoc-cta-eyebrow {
+    color: var(--gold);
+}
+
+.assoc-cta-text {
+    max-width: 560px;
+    margin: 14px 0 0;
+    opacity: 0.92;
+    line-height: 1.6;
+}
+
+.assoc-cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.assoc-cta-actions .btn {
+    min-height: 48px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .assoc-hero-img {
+        animation: none;
+    }
+}

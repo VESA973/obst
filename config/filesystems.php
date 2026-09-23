@@ -43,6 +43,12 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('FILESYSTEM_PUBLIC_URL', '/storage'),
             'visibility' => 'public',
+            // Écriture de groupe : le serveur web (www-data) et PHP en ligne de commande
+            // partagent ce disque (miniatures, imports) via le groupe www-data.
+            'permissions' => [
+                'file' => ['public' => 0664, 'private' => 0600],
+                'dir' => ['public' => 0775, 'private' => 0700],
+            ],
             'throw' => false,
             'report' => false,
         ],

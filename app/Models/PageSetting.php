@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\DeletesPublicFiles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 
 class PageSetting extends Model
 {
+    use DeletesPublicFiles;
+
+    /** @var list<string> Colonnes contenant un chemin sur le disque public. */
+    protected array $publicFiles = ['hero_image_path'];
+
     protected $fillable = [
         'page_key',
         'menu_label',

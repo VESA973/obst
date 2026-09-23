@@ -35,9 +35,11 @@ class CheckSiteMaintenance
 
     private function isAllowedDuringMaintenance(Request $request): bool
     {
+        // Livewire sert le panneau Filament : sans lui, la connexion admin serait bloquée.
         return $request->is(
             'admin',
-            'admin/*'
+            'admin/*',
+            'livewire/*',
         );
     }
 }

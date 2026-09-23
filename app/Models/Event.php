@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\DeletesPublicFiles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
 {
-    use HasFactory;
+    use DeletesPublicFiles, HasFactory;
+
+    /** @var list<string> Colonnes contenant un chemin sur le disque public. */
+    protected array $publicFiles = ['image_path'];
 
     protected $fillable = [
         'title',
@@ -31,6 +35,19 @@ class Event extends Model
             'is_paid' => 'boolean',
             'is_published' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Event $event): void {
+            // Sans date principale, on reprend la première date du programme.
+            if (! $event->event_date && filled($event->schedule_items)) {
+                $event->event_date = collect($event->schedule_items)->pluck('date')->filter()->sort()->first();
+            }
+        });
+
+        // Supprime photos et documents un par un pour effacer aussi leurs fichiers.
+        static::deleting(fn (Event $event) => $event->assets->each->delete());
     }
 
     public function registrations(): HasMany

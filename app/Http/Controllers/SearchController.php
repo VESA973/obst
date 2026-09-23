@@ -29,19 +29,20 @@ class SearchController extends Controller
             ->take(4)
             ->values();
 
-        $articles = Article::where('is_published', true)
+        $articles = Article::onSite()
+            ->with('category')
             ->where(function ($builder) use ($query) {
                 $builder->where('title', 'like', "%{$query}%")
                     ->orWhere('excerpt', 'like', "%{$query}%")
                     ->orWhere('body', 'like', "%{$query}%")
-                    ->orWhere('category', 'like', "%{$query}%");
+                    ->orWhereHas('category', fn ($category) => $category->where('name', 'like', "%{$query}%"));
             })
             ->take(5)
             ->get()
             ->map(fn (Article $article) => [
                 'title' => $article->title,
                 'type' => 'Actualite',
-                'url' => $article->external_url ?: route('news').'#article-'.$article->id,
+                'url' => $article->external_url ?: $article->publicUrl(),
             ]);
 
         $events = Event::where('is_published', true)

@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Mail\EventRegistrationConfirmation;
 use App\Models\Event;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -41,27 +40,5 @@ class EventRegistrationMailTest extends TestCase
             return $mail->hasTo('marie@example.com')
                 && $mail->registration->event->title === 'Atelier gratuit';
         });
-    }
-
-    public function test_admin_can_export_event_registrations_as_csv(): void
-    {
-        $admin = User::factory()->create(['is_admin' => true]);
-        $event = Event::create([
-            'title' => 'Atelier CSV',
-            'event_date' => now()->addWeek()->toDateString(),
-            'is_published' => true,
-        ]);
-        $event->registrations()->create([
-            'name' => 'Jean Export',
-            'email' => 'jean@example.com',
-        ]);
-
-        $response = $this->actingAs($admin)
-            ->get(route('admin.events.registrations.export'))
-            ->assertOk()
-            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
-
-        $this->assertStringContainsString('Atelier CSV', $response->streamedContent());
-        $this->assertStringContainsString('jean@example.com', $response->streamedContent());
     }
 }

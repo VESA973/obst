@@ -1,12 +1,14 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EventQrCodeController;
 use App\Http\Controllers\EventRegistrationController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfessionalAuthController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -21,12 +23,21 @@ Route::get('/sante-des-femmes/{category:slug}', [PageController::class, 'publicC
 Route::get('/sante-des-femmes/{category:slug}/{article:slug}', [PageController::class, 'publicArticle'])->name('public.article');
 Route::view('/espace-pro', 'pages.pro')->name('pro');
 Route::get('/espace-pro/ressources', [PageController::class, 'professionalResources'])->name('pro.resources');
-Route::get('/actualites', [PageController::class, 'news'])->name('news');
-Route::get('/actualites/{article:slug}', [PageController::class, 'article'])->name('articles.show');
+// Rubrique Actualités. Les routes fixes passent avant /actualites/{slug}.
+Route::get('/actualites', [NewsController::class, 'index'])->name('news');
+Route::get('/actualites/recherche', [NewsController::class, 'search'])->name('news.search');
+Route::get('/actualites/rss.xml', [NewsController::class, 'feed'])->name('news.feed');
+Route::get('/actualites/{slug}', [NewsController::class, 'category'])->name('news.category');
+Route::get('/actualites/{category}/{article}', [NewsController::class, 'show'])->name('news.show');
+Route::post('/newsletter', [NewsletterController::class, 'store'])->middleware('throttle:5,1')->name('newsletter.subscribe');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/agenda', [PageController::class, 'agenda'])->name('agenda');
+Route::get('/agenda/{event}', [PageController::class, 'agendaShow'])->name('agenda.show');
+Route::get('/agenda/{event}/calendrier.ics', [PageController::class, 'agendaIcs'])->name('agenda.ics');
 Route::view('/recherche-innovation', 'pages.research')->name('research');
 Route::view('/nous-soutenir', 'pages.join')->name('join');
 Route::view('/contact', 'pages.contact')->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.send');
 Route::view('/mentions-legales', 'pages.legal.mentions')->name('legal.mentions');
 Route::view('/politique-de-confidentialite', 'pages.legal.privacy')->name('legal.privacy');
 Route::view('/politique-de-cookies', 'pages.legal.cookies')->name('legal.cookies');
@@ -49,52 +60,16 @@ Route::post('/professionnels/mot-de-passe', [ProfessionalAuthController::class, 
 Route::get('/professionnels/google', [ProfessionalAuthController::class, 'redirectToGoogle'])->name('professional.google.redirect');
 Route::get('/professionnels/google/retour', [ProfessionalAuthController::class, 'handleGoogleCallback'])->name('professional.google.callback');
 
-Route::get('/admin', [AdminAuthController::class, 'loginForm'])->name('admin.dashboard');
-Route::get('/admin/connexion', [AdminAuthController::class, 'loginForm'])->name('admin.login');
-Route::post('/admin/connexion', [AdminAuthController::class, 'login'])->name('admin.login.store');
-Route::post('/admin/deconnexion', [AdminAuthController::class, 'logout'])->middleware('auth')->name('admin.logout');
+// L'administration est gérée par Filament (App\Providers\Filament\AdminPanelProvider).
+// Anciennes adresses conservées pour les favoris.
+Route::redirect('/admin/connexion', '/admin/login');
+Route::redirect('/admin/tableau-de-bord', '/admin');
 
+// Premier administrateur : un compte connecté devient admin tant qu'aucun admin n'existe.
 Route::get('/admin/initialiser', function () {
     abort_if(User::where('is_admin', true)->exists(), 403);
 
     auth()->user()->forceFill(['is_admin' => true])->save();
 
-    return redirect()->route('admin.home')->with('status', 'Votre compte est maintenant administrateur.');
+    return redirect('/admin');
 })->middleware('auth')->name('admin.bootstrap');
-
-Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/tableau-de-bord', [AdminController::class, 'index'])->name('home');
-    Route::get('/configuration', [AdminController::class, 'configuration'])->name('configuration');
-    Route::put('/configuration', [AdminController::class, 'updateSettings'])->name('settings.update');
-    Route::get('/pages', [AdminController::class, 'pages'])->name('pages.index');
-    Route::put('/pages', [AdminController::class, 'updatePages'])->name('pages.update');
-    Route::get('/actualites', [AdminController::class, 'articles'])->name('articles.index');
-    Route::get('/inscriptions', [AdminController::class, 'registrations'])->name('registrations.index');
-    Route::get('/professionnels', [AdminController::class, 'professionals'])->name('professionals.index');
-    Route::put('/professionnels/{user}', [AdminController::class, 'updateProfessional'])->name('professionals.update');
-    Route::delete('/professionnels/{user}', [AdminController::class, 'destroyProfessional'])->name('professionals.destroy');
-    Route::get('/membres', [AdminController::class, 'members'])->name('members.index');
-    Route::post('/membres', [AdminController::class, 'storeMember'])->name('members.store');
-    Route::put('/membres/{member}', [AdminController::class, 'updateMember'])->name('members.update');
-    Route::delete('/membres/{member}', [AdminController::class, 'destroyMember'])->name('members.destroy');
-    Route::get('/fichiers', [AdminController::class, 'files'])->name('files.index');
-    Route::post('/fichiers', [AdminController::class, 'storeFile'])->name('files.store');
-    Route::delete('/fichiers/{file}', [AdminController::class, 'destroyFile'])->name('files.destroy');
-    Route::post('/actualites/categories', [AdminController::class, 'storeArticleCategory'])->name('article-categories.store');
-    Route::put('/actualites/categories/{category}', [AdminController::class, 'updateArticleCategory'])->name('article-categories.update');
-    Route::delete('/actualites/categories/{category}', [AdminController::class, 'destroyArticleCategory'])->name('article-categories.destroy');
-    Route::post('/actualites', [AdminController::class, 'storeArticle'])->name('articles.store');
-    Route::put('/actualites/{article}', [AdminController::class, 'updateArticle'])->name('articles.update');
-    Route::delete('/actualites/{article}', [AdminController::class, 'destroyArticle'])->name('articles.destroy');
-    Route::delete('/actualites/photos/{asset}', [AdminController::class, 'destroyArticleAsset'])->name('articles.assets.destroy');
-    Route::get('/evenements', [AdminController::class, 'events'])->name('events.index');
-    Route::get('/evenements/inscriptions/export', [AdminController::class, 'exportEventRegistrations'])->name('events.registrations.export');
-    Route::post('/evenements', [AdminController::class, 'storeEvent'])->name('events.store');
-    Route::put('/evenements/{event}', [AdminController::class, 'updateEvent'])->name('events.update');
-    Route::delete('/evenements/{event}', [AdminController::class, 'destroyEvent'])->name('events.destroy');
-    Route::delete('/evenements/fichiers/{asset}', [AdminController::class, 'destroyEventAsset'])->name('events.assets.destroy');
-    Route::get('/utilisateurs', [AdminController::class, 'users'])->name('users.index');
-    Route::post('/utilisateurs', [AdminController::class, 'storeUser'])->name('users.store');
-    Route::put('/utilisateurs/{user}', [AdminController::class, 'updateUser'])->name('users.update');
-    Route::delete('/utilisateurs/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
-});

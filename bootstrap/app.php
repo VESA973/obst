@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Middleware\CheckSiteMaintenance;
-use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,12 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias([
-            'admin' => EnsureUserIsAdmin::class,
-        ]);
         $middleware->redirectGuestsTo(function ($request): string {
-            return $request->is('admin') || $request->is('admin/*')
-                ? route('admin.login')
+            // /admin/initialiser passe par la connexion du site : le panneau refuse les non-admins.
+            return $request->is('admin', 'admin/*') && ! $request->is('admin/initialiser')
+                ? route('filament.admin.auth.login')
                 : route('login');
         });
         $middleware->web(append: [

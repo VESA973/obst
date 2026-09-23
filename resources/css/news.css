@@ -1,0 +1,162 @@
+/*
+ * Rubrique Actualités : styles qui ne s'expriment pas simplement en utilitaires Tailwind.
+ * Tout est limité au conteneur .news-root (mode sombre compris).
+ */
+
+@layer components {
+    .news-root {
+        font-family: var(--font-news);
+        color: #1c1626;
+        background: #ffffff;
+        --news-muted: #5f5870;
+        --news-line: #e7e3ee;
+        --news-surface: #f7f5fb;
+    }
+
+    .news-root.dark {
+        color: #ece8f4;
+        background: #0f0c16;
+        color-scheme: dark;
+        --news-muted: #a79fba;
+        --news-line: #2a2436;
+        --news-surface: #181322;
+    }
+
+    /* Carte entièrement cliquable : le lien du titre couvre toute la carte. */
+    .news-card-link::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+
+    /* Les liens internes (badge catégorie) restent cliquables au-dessus du lien de carte. */
+    .news-card .news-card-above {
+        position: relative;
+        z-index: 2;
+    }
+
+    .news-card:has(.news-card-link:focus-visible) {
+        outline: 3px solid var(--color-accent);
+        outline-offset: 4px;
+        border-radius: 0.75rem;
+    }
+
+    .news-card-link:focus-visible {
+        outline: none;
+    }
+
+    /* Bandeau « Dernière minute » : défilement continu, en pause au survol. */
+    .news-ticker-track {
+        display: flex;
+        width: max-content;
+        animation: news-ticker 45s linear infinite;
+    }
+
+    .news-ticker:hover .news-ticker-track,
+    .news-ticker:focus-within .news-ticker-track {
+        animation-play-state: paused;
+    }
+
+    @keyframes news-ticker {
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    /* Apparition au défilement (activée par news.js). */
+    /* Masqué seulement si le script d'animation est actif (classe posée dans le gabarit). */
+    .news-root.has-reveal .news-reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .news-root.has-reveal .news-reveal.is-visible {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* Barre de progression de lecture. */
+    .news-progress {
+        transform-origin: left;
+        transform: scaleX(var(--progress, 0));
+    }
+
+    /* Barre de catégories défilante sur mobile, sans barre de défilement visible. */
+    .news-scroll-x {
+        scrollbar-width: none;
+    }
+
+    .news-scroll-x::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Surlignage des termes recherchés. */
+    .news-root mark {
+        background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+        color: inherit;
+        border-radius: 0.2em;
+        padding: 0 0.1em;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .news-ticker-track {
+            animation: none;
+            flex-wrap: wrap;
+            width: auto;
+        }
+
+        .news-root.has-reveal .news-reveal {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+
+        .news-root *,
+        .news-root *::before,
+        .news-root *::after {
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+/* Sur les pages Actualités, c'est la barre Actualités qui reste collée en haut. */
+.news-page .site-header {
+    position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .news-ticker-track [aria-hidden='true'] {
+        display: none;
+    }
+}
+
+/* Question anti-robot de la newsletter, adaptée au mode sombre. */
+.news-root.dark .captcha-field {
+    border-color: var(--news-line);
+    background: var(--news-surface);
+}
+
+.news-root.dark .captcha-field input {
+    color: inherit;
+    background: #0f0c16;
+    border-color: var(--news-line);
+}
+
+/* Sommaire des articles « Santé de la femme » : section en cours et ancres. */
+.news-toc a[aria-current='true'] {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    font-weight: 600;
+}
+
+.news-root.dark .news-toc a[aria-current='true'] {
+    color: var(--color-accent-light);
+    border-color: var(--color-accent-light);
+}
+
+.news-article-body :where(h2, h3) {
+    scroll-margin-top: 6rem;
+}

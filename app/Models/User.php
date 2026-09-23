@@ -5,12 +5,15 @@ namespace App\Models;
 use App\Notifications\ProfessionalResetPasswordNotification;
 use App\Notifications\ProfessionalVerifyEmailNotification;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -56,9 +59,22 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    /**
+     * Seuls les administrateurs accèdent au panneau Filament.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_admin;
+    }
+
+    public function articles(): HasMany
+    {
+        return $this->hasMany(Article::class);
+    }
+
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new ProfessionalVerifyEmailNotification());
+        $this->notify(new ProfessionalVerifyEmailNotification);
     }
 
     public function sendPasswordResetNotification($token): void

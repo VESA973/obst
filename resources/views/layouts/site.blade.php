@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'La Quinzaine Obstétricale')</title>
     <meta name="description" content="@yield('description', 'La Quinzaine Obstétricale agit pour la santé de la femme et de la périnatalité en Guyane.')">
+    @stack('head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="@yield('body_class')">
     <header class="site-header">
         <div class="header-top">
             <a class="brand" href="{{ route('home') }}" aria-label="Accueil La Quinzaine Obstétricale">
@@ -29,6 +30,8 @@
                         <span>Espace pro</span>
                     </button>
                 @endauth
+                {{-- Actions propres à une page (ex. bouton Urgences de l'accueil). --}}
+                @stack('header-actions')
                 <a class="nav-join" href="{{ route('join') }}">Nous soutenir</a>
             </div>
         </div>
