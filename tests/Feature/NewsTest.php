@@ -186,14 +186,14 @@ class NewsTest extends TestCase
         $this->assertSame($category, $count(route('news.category', 'tribunes')));
     }
 
-    public function test_breaking_news_ticker_can_be_disabled(): void
+    public function test_breaking_news_ticker_is_hidden_by_default_and_can_be_enabled(): void
     {
         Article::factory()->for($this->tribunes, 'category')->create();
 
-        $this->get(route('news'))->assertSee('Dernière minute');
-
-        config(['news.ticker' => false]);
         $this->get(route('news'))->assertDontSee('Dernière minute');
+
+        config(['news.ticker' => true]);
+        $this->get(route('news'))->assertSee('Dernière minute');
     }
 
     public function test_rss_feed_and_sitemap_list_visible_articles(): void
