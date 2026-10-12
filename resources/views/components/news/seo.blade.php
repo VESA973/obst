@@ -56,7 +56,7 @@
                 'publisher' => [
                     '@type' => 'Organization',
                     'name' => $siteName,
-                    'logo' => ['@type' => 'ImageObject', 'url' => asset('images/quinzaine-logo.jpeg')],
+                    'logo' => ['@type' => 'ImageObject', 'url' => asset('images/quinzaine-logo.png')],
                 ],
             ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}
         </script>

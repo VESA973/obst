@@ -178,7 +178,7 @@
             '@type' => 'NGO',
             'name' => 'La Quinzaine Obstétricale',
             'url' => route('home'),
-            'logo' => asset('images/quinzaine-logo.jpeg'),
+            'logo' => asset('images/quinzaine-logo.png'),
             'description' => $page['description'] ?? null,
             'areaServed' => ['@type' => 'AdministrativeArea', 'name' => 'Guyane'],
             'image' => $heroImage ? \Illuminate\Support\Facades\Storage::disk('public')->url($heroImage->path) : null,

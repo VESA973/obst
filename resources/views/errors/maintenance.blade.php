@@ -9,7 +9,7 @@
 <body>
     <main class="maintenance-page">
         <section class="maintenance-card">
-            <img src="{{ asset('images/quinzaine-logo.jpeg') }}" alt="La Quinzaine Obstétricale">
+            <img src="{{ asset('images/quinzaine-logo.png') }}" alt="La Quinzaine Obstétricale">
             <p class="eyebrow">Maintenance</p>
             <h1>Le site revient bientot</h1>
             <p>{{ $message }}</p>

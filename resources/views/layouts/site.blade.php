@@ -12,7 +12,7 @@
     <header class="site-header">
         <div class="header-top">
             <a class="brand" href="{{ route('home') }}" aria-label="Accueil La Quinzaine Obstétricale">
-                <img class="brand-logo" src="{{ asset('images/quinzaine-logo.jpeg') }}" alt="Quinzaine Obstétricale CHAR">
+                <img class="brand-logo" src="{{ asset('images/quinzaine-logo.png') }}" alt="Quinzaine Obstétricale">
             </a>
 
             <div class="header-actions" aria-label="Actions rapides">
