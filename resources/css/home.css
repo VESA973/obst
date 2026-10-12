@@ -68,31 +68,6 @@
     }
 }
 
-.home-header-emergency {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 16px;
-    border: 2px solid var(--coral-dark);
-    border-radius: 999px;
-    color: var(--coral-dark);
-    font-weight: 800;
-    background: var(--white);
-    transition: background 180ms ease, color 180ms ease;
-}
-
-.home-header-emergency svg {
-    width: 18px;
-    height: 18px;
-}
-
-.home-header-emergency:hover,
-.home-header-emergency:focus-visible {
-    color: var(--white);
-    background: var(--coral-dark);
-}
-
 /* ---------- Hero : grande photo, dégradé existant, zoom lent, vague « fleuve » ---------- */
 
 .home-hero {
@@ -181,39 +156,73 @@
     box-shadow: var(--home-shadow-md);
 }
 
-.home-hero-emergency {
+/* Titre : 4 mots révélés un à un (flou + montée), puis un reflet corail passe sur chaque mot à tour de rôle (cycle de 8 s). */
+.home-hero-title {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 10px;
-    margin: 26px 0 0;
-    color: var(--muted);
-    font-weight: 700;
+    gap: 0 0.32em;
 }
 
-.home-hero-emergency svg {
-    width: 18px;
-    height: 18px;
-    color: var(--coral-dark);
+.home-hero-title span {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.08em;
+    color: var(--deep-teal);
+    background: linear-gradient(100deg, var(--deep-teal) 0 30%, var(--coral) 45%, var(--teal) 55%, var(--deep-teal) 70% 100%) 0 0 / 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation:
+        home-word-in 900ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(160ms + var(--i) * 120ms) both,
+        home-word-sweep 8s ease-in-out calc(1.2s + var(--i) * 2s) infinite;
 }
 
-.home-hero-emergency a {
-    display: inline-grid;
-    place-items: center;
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0 12px;
+.home-hero-title span::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 0.08em;
     border-radius: 999px;
-    color: var(--white);
-    font-size: 1.05rem;
-    font-weight: 900;
-    background: var(--coral-dark);
-    transition: background 180ms ease;
+    background: linear-gradient(90deg, var(--coral), var(--teal));
+    transform: scaleX(0);
+    animation: home-word-line 8s ease-in-out calc(1.2s + var(--i) * 2s) infinite;
 }
 
-.home-hero-emergency a:hover,
-.home-hero-emergency a:focus-visible {
-    background: var(--deep-teal);
+@keyframes home-word-in {
+    from {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translateY(0.45em);
+    }
+}
+
+@keyframes home-word-sweep {
+    0% {
+        background-position: 100% 0;
+    }
+
+    22%,
+    100% {
+        background-position: 0 0;
+    }
+}
+
+@keyframes home-word-line {
+    0%,
+    100% {
+        transform: scaleX(0);
+    }
+
+    8%,
+    20% {
+        transform: scaleX(1);
+    }
+
+    25% {
+        transform: scaleX(0);
+    }
 }
 
 /* Apparition douce du contenu du hero. */
@@ -414,21 +423,8 @@
 
 @media (min-width: 1100px) {
     .home-quick ul {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
     }
-}
-
-.home-quick-card--urgent {
-    border-color: color-mix(in srgb, var(--coral-dark) 40%, var(--line));
-}
-
-.home-quick-card--urgent .home-quick-icon {
-    color: var(--white);
-    background: var(--coral-dark);
-}
-
-.home-quick-card--urgent:hover .home-quick-icon {
-    background: var(--deep-teal);
 }
 
 /* ---------- Sections ---------- */
@@ -909,7 +905,9 @@
 
 @media (prefers-reduced-motion: reduce) {
     .home-hero-img,
-    .home-appear {
+    .home-appear,
+    .home-hero-title span,
+    .home-hero-title span::after {
         animation: none;
     }
 

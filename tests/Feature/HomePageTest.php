@@ -22,7 +22,8 @@ class HomePageTest extends TestCase
             ->assertSee('rel="preload" as="image" type="image/webp"', false)
             ->assertSee('images/guyane-hero-800.webp 800w', false)
             ->assertSee('images/guyane-hero.png', false)
-            ->assertSee('Informer. Former. Innover. Agir.')
+            ->assertSee(['Informer', 'Former', 'Innover', 'Agir'])
+            ->assertDontSee('Informer. Former.')
             ->assertSee(route('join'))
             ->assertSee(route('contact'));
 
@@ -31,7 +32,7 @@ class HomePageTest extends TestCase
         }
     }
 
-    public function test_quick_access_links_to_existing_pages_and_emergency_numbers(): void
+    public function test_quick_access_links_to_existing_pages(): void
     {
         $this->get(route('home'))
             ->assertOk()
@@ -40,8 +41,7 @@ class HomePageTest extends TestCase
             ->assertSee(route('news'))
             ->assertSee(route('agenda'))
             ->assertSee(route('pro'))
-            ->assertSee('href="tel:15"', false)
-            ->assertSee('href="tel:112"', false);
+            ->assertDontSee('href="tel:15"', false);
     }
 
     public function test_greeting_only_shows_configured_translations(): void
@@ -89,14 +89,13 @@ class HomePageTest extends TestCase
             ->assertDontSee('Santé des femmes en Guyane');
     }
 
-    public function test_home_assets_and_emergency_button_are_limited_to_the_home_page(): void
+    public function test_home_assets_are_limited_to_the_home_page(): void
     {
         // Vite référence les fichiers compilés : build/assets/home-….js et home-….css.
-        $this->get(route('home'))->assertSee('home-header-emergency', false)->assertSee('build/assets/home-', false);
+        $this->get(route('home'))->assertSee('build/assets/home-', false);
 
         $this->get(route('about'))
             ->assertOk()
-            ->assertDontSee('home-header-emergency', false)
             ->assertDontSee('build/assets/home-', false);
     }
 }

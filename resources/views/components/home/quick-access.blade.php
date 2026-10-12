@@ -1,6 +1,5 @@
 {{--
     Accès rapides vers les pages existantes du site, chevauchant le bas de la grande photo.
-    La carte « Urgences » appelle directement le 15 (SAMU) ; le 112 est rappelé dans son texte.
 --}}
 @php
     // Icônes au trait (style Lucide, 24×24).
@@ -11,7 +10,6 @@
         ['href' => route('pro'), 'title' => 'Espace pro', 'text' => 'Ressources pour les soignants', 'icon' => '<path d="M11 2v2M5 2v2M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/>'],
         ['href' => route('contact'), 'title' => 'Contact', 'text' => 'Une question ? Écrivez-nous', 'icon' => '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>'],
     ];
-    $samu = collect(config('home.emergency'))->firstWhere('number', '15');
 @endphp
 
 <nav class="home-quick" aria-label="Accès rapides">
@@ -29,16 +27,5 @@
                 </a>
             </li>
         @endforeach
-        <li>
-            <a class="home-quick-card home-quick-card--urgent" href="tel:{{ $samu['number'] ?? '15' }}">
-                <span class="home-quick-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-2.5a2 2 0 0 0-1.9 1.4l-2.4 7.6a.25.25 0 0 1-.5 0L9.2 3a.25.25 0 0 0-.5 0L6.4 10.6A2 2 0 0 1 4.5 12H2"/></svg>
-                </span>
-                <span class="home-quick-text">
-                    <strong>Urgences : 15</strong>
-                    <span>SAMU, ou 112 depuis tout téléphone</span>
-                </span>
-            </a>
-        </li>
     </ul>
 </nav>

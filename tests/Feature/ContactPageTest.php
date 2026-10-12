@@ -36,14 +36,13 @@ class ContactPageTest extends TestCase
         ];
     }
 
-    public function test_page_shows_the_form_urgent_numbers_and_real_newsletter(): void
+    public function test_page_shows_the_form_and_real_newsletter(): void
     {
         $this->get(route('contact'))
             ->assertOk()
             ->assertSee('action="'.route('contact.send').'"', false)
             ->assertSee('Un partenariat')
-            ->assertSee('href="tel:15"', false)
-            ->assertSee('href="tel:112"', false)
+            ->assertDontSee('href="tel:15"', false)
             ->assertSee('action="'.route('newsletter.subscribe').'"', false)
             ->assertSee('Inscrivez-vous pour suivre les manifestations, ressources et appels à participation.')
             // Plus aucune adresse fictive ni lien mailto de formulaire.

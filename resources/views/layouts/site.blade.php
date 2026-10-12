@@ -30,7 +30,7 @@
                         <span>Espace pro</span>
                     </button>
                 @endauth
-                {{-- Actions propres à une page (ex. bouton Urgences de l'accueil). --}}
+                {{-- Actions propres à une page. --}}
                 @stack('header-actions')
                 <a class="nav-join" href="{{ route('join') }}">Nous soutenir</a>
             </div>

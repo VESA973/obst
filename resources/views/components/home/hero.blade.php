@@ -1,7 +1,6 @@
 {{--
     Hero de l'accueil : grande photo de Guyane (WebP responsive, préchargée), dégradé aux couleurs
-    du site, motifs végétaux en bordure, formule d'accueil (config/home.php), boutons existants,
-    rappel des numéros d'urgence et vague « fleuve » vers la section suivante.
+    du site, motifs végétaux en bordure, formule d'accueil (config/home.php), boutons existants et vague « fleuve » vers la section suivante.
 --}}
 @php
     $sizes = [800, 1200, 1808];
@@ -31,21 +30,17 @@
             @endforeach
         </p>
         <p class="eyebrow home-appear" style="--delay: 80ms">Santé de la femme et périnatalité en Guyane</p>
-        <h1 id="home-hero-title" class="home-appear" style="--delay: 160ms">Informer. Former. Innover. Agir.</h1>
+        <h1 id="home-hero-title" class="home-hero-title">
+            @foreach (['Informer', 'Former', 'Innover', 'Agir'] as $word)
+                <span style="--i: {{ $loop->index }}">{{ $word }}</span>
+            @endforeach
+        </h1>
         <p class="lead home-appear" style="--delay: 240ms">Ensemble pour une meilleure santé de la femme et de la périnatalité en Guyane.</p>
         <div class="hero-actions home-appear" style="--delay: 320ms">
             <a class="btn primary" href="{{ route('join') }}">Adhérer</a>
             <a class="btn secondary" href="{{ route('join') }}#don">Faire un don</a>
             <a class="btn secondary" href="{{ route('contact') }}">Nous contacter</a>
         </div>
-        <p class="home-hero-emergency home-appear" style="--delay: 400ms">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg>
-            <span>Urgence médicale :</span>
-            @foreach (config('home.emergency') as $emergency)
-                <a href="tel:{{ $emergency['number'] }}">{{ $emergency['number'] }} <span class="sr-only">({{ $emergency['label'] }})</span></a>
-                @if (! $loop->last)<span aria-hidden="true">ou</span>@endif
-            @endforeach
-        </p>
     </div>
 
     <x-home.wave-divider fill="var(--mint)" class="home-wave--hero" />

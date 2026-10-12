@@ -15,9 +15,4 @@ return [
         ['lang' => 'fr', 'label' => 'Français', 'text' => 'Bienvenue'],
     ],
 
-    // Numéros d'urgence affichés sur l'accueil.
-    'emergency' => [
-        ['number' => '15', 'label' => 'SAMU', 'description' => 'Urgence médicale'],
-        ['number' => '112', 'label' => 'Urgences', 'description' => 'Numéro européen, depuis tout téléphone'],
-    ],
 ];

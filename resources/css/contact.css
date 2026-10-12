@@ -312,47 +312,6 @@
 
 /* ---------- Urgences ---------- */
 
-.contact-urgent {
-    border-color: color-mix(in srgb, var(--coral-dark) 35%, var(--line));
-}
-
-.contact-urgent-numbers {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-}
-
-.contact-urgent-numbers a {
-    display: grid;
-    gap: 2px;
-    min-height: 44px;
-    padding: 12px;
-    border-radius: 16px;
-    color: var(--white);
-    text-align: center;
-    background: var(--coral-dark);
-    transition: background 180ms ease;
-}
-
-.contact-urgent-numbers a:hover,
-.contact-urgent-numbers a:focus-visible {
-    background: var(--deep-teal);
-}
-
-.contact-urgent-numbers strong {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 1.9rem;
-    font-weight: 500;
-    line-height: 1;
-}
-
-.contact-urgent-numbers span {
-    font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
 /* ---------- Coordonnées, réseaux, liens ---------- */
 
 .contact-details,

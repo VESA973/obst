@@ -1,6 +1,6 @@
 {{--
     Page Contact : hero (réglages « Pages du site »), formulaire enregistré en base (ContactController,
-    Filament > Communauté > Messages), rappel des numéros d'urgence, coordonnées (config/contact.php,
+    Filament > Communauté > Messages), coordonnées (config/contact.php,
     masquées si vides), inscription à la lettre d'information et liens utiles.
     Script : resources/js/contact.js (cette page uniquement).
 --}}
@@ -126,20 +126,6 @@
             </section>
 
             <div class="contact-side">
-                {{-- Le formulaire ne remplace pas une consultation : rappel des urgences. --}}
-                <aside class="contact-card contact-urgent home-reveal" aria-labelledby="contact-urgent-title">
-                    <span class="contact-card-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.5a2 2 0 0 0-1.9 1.4l-2.4 7.6a.25.25 0 0 1-.5 0L9.2 3a.25.25 0 0 0-.5 0L6.4 10.6A2 2 0 0 1 4.5 12H2"/></svg>
-                    </span>
-                    <h2 id="contact-urgent-title">Une urgence médicale ?</h2>
-                    <p>Ce formulaire n'est pas adapté aux urgences ni aux demandes de conseil médical personnel.</p>
-                    <div class="contact-urgent-numbers">
-                        @foreach (config('home.emergency') as $emergency)
-                            <a href="tel:{{ $emergency['number'] }}"><strong>{{ $emergency['number'] }}</strong><span>{{ $emergency['label'] }}</span></a>
-                        @endforeach
-                    </div>
-                </aside>
-
                 @if ($hasDetails)
                     <aside class="contact-card home-reveal" aria-labelledby="contact-details-title">
                         <h2 id="contact-details-title">Nos coordonnées</h2>
