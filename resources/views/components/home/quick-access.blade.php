@@ -17,9 +17,12 @@
         @foreach ($items as $item)
             <li>
                 <a class="home-quick-card" href="{{ $item['href'] }}">
-                    <img class="home-quick-img" src="{{ asset('images/quick/'.$item['image'].'.webp') }}" alt="" width="640" height="400" loading="lazy" decoding="async">
+                    <span class="home-quick-media"><img src="{{ asset('images/quick/'.$item['image'].'.webp') }}" alt="" width="640" height="400" loading="lazy" decoding="async"></span>
                     <span class="home-quick-text">
-                        <strong>{{ $item['title'] }}</strong>
+                        <strong>
+                            {{ $item['title'] }}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                        </strong>
                         <span>{{ $item['text'] }}</span>
                     </span>
                 </a>
