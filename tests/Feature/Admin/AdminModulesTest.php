@@ -99,15 +99,14 @@ class AdminModulesTest extends TestCase
             ->assertSee('assoc-title-large');
     }
 
-    public function test_public_pages_have_default_example_header_images(): void
+    public function test_public_pages_have_their_own_default_header_images(): void
     {
         $this->get(route('actions'))
             ->assertOk()
             ->assertSee('has-hero-image')
-            ->assertSee('/images/page-headers/guyane-page-example.png', false);
+            ->assertSee('/images/page-headers/actions.webp', false);
 
-        // Page « L'association » : même image par défaut tant qu'aucune bannière dédiée n'est envoyée.
-        $this->get(route('about'))->assertSee('/images/page-headers/quinzaine-page-example.png', false);
+        $this->get(route('about'))->assertSee('/images/page-headers/about.webp', false);
     }
 
     public function test_public_navigation_uses_association_submenu_and_hides_search(): void

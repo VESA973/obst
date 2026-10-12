@@ -39,7 +39,7 @@ class AssociationPageFrontTest extends TestCase
             // Pas de galerie tant qu'aucune photo visible n'existe.
             ->assertDontSee('assoc-gallery', false)
             // Bannière : image d'en-tête de « Pages du site » en attendant une photo dédiée.
-            ->assertSee('images/page-headers/quinzaine-page-example.png', false);
+            ->assertSee('images/page-headers/about.webp', false);
     }
 
     public function test_slot_images_and_visible_gallery_photos_are_displayed(): void
