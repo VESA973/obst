@@ -73,6 +73,14 @@
             <li>Nous soutenir : <a href="https://commons.wikimedia.org/wiki/File:Carbet_flottant_dans_les_marais_de_Kaw.jpg" rel="noopener" target="_blank">Carbet flottant dans les marais de Kaw</a>, Don-vip, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
             <li>Espace pro : <a href="https://commons.wikimedia.org/wiki/File:Fromager_Sa%C3%BCl.jpg" rel="noopener" target="_blank">Fromager Saül</a>, Jonathan Rochet, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
         </ul>
+        <p>Les vignettes des accès rapides de l’accueil proviennent aussi de Wikimedia Commons :</p>
+        <ul>
+            <li>Fiches santé : <a href="https://commons.wikimedia.org/wiki/File:Olsztyn,_Poland_(Unsplash_xTedodxYTuQ).jpg" rel="noopener" target="_blank">Olsztyn, Poland</a>, freestocks.org, <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.fr" rel="noopener" target="_blank">CC0</a></li>
+            <li>Actualités : <a href="https://commons.wikimedia.org/wiki/File:Tablet_on_a_newspaper_(Unsplash).jpg" rel="noopener" target="_blank">Tablet on a newspaper</a>, Matthew Guay, <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.fr" rel="noopener" target="_blank">CC0</a></li>
+            <li>Agenda : <a href="https://commons.wikimedia.org/wiki/File:Life_Planner_(Unsplash_Y-8VPGLW86A).jpg" rel="noopener" target="_blank">Life Planner</a>, Annie Spratt, <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.fr" rel="noopener" target="_blank">CC0</a></li>
+            <li>Espace pro : <a href="https://commons.wikimedia.org/wiki/File:Nurse_holding_an_apple_while_sitting_at_a_desk_with_a_laptop_and_a_stethoscope.jpg" rel="noopener" target="_blank">Nurse holding an apple while sitting at a desk with a laptop and a stethoscope</a>, Shixart1985, <a href="https://creativecommons.org/licenses/by/2.0" rel="noopener" target="_blank">CC BY 2.0</a></li>
+            <li>Contact : <a href="https://commons.wikimedia.org/wiki/File:Envelopes_(Unsplash).jpg" rel="noopener" target="_blank">Envelopes</a>, Joanna Kosinska, <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.fr" rel="noopener" target="_blank">CC0</a></li>
+        </ul>
     </section>
 
     <section>
