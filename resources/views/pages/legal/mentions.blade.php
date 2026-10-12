@@ -61,6 +61,21 @@
     </section>
 
     <section>
+        <h2>Crédits photos</h2>
+        <p>Les bannières des pages intérieures sont des photographies de Wikimedia Commons, recadrées et compressées pour le web :</p>
+        <ul>
+            <li>L'association : <a href="https://commons.wikimedia.org/wiki/File:Cayenne_Maisons_cr%C3%A9oles.jpg" rel="noopener" target="_blank">Cayenne Maisons créoles</a>, Cayambe, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
+            <li>Nos actions : <a href="https://commons.wikimedia.org/wiki/File:Pirogues_sur_les_rives_du_fleuve_Maroni.jpg" rel="noopener" target="_blank">Pirogues sur les rives du fleuve Maroni</a>, Lechatsylvestre, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
+            <li>Actualités : <a href="https://commons.wikimedia.org/wiki/File:Cayenne_place_des_palmistes_2013.jpg" rel="noopener" target="_blank">Cayenne place des palmistes 2013</a>, Cayambe, <a href="https://creativecommons.org/licenses/by-sa/3.0" rel="noopener" target="_blank">CC BY-SA 3.0</a></li>
+            <li>Agenda : <a href="https://commons.wikimedia.org/wiki/File:Carbet_au_marais_de_Kaw.jpg" rel="noopener" target="_blank">Carbet au marais de Kaw</a>, Don-vip, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
+            <li>Recherche : <a href="https://commons.wikimedia.org/wiki/File:Canop%C3%A9e_01.jpg" rel="noopener" target="_blank">Canopée 01</a>, Ronan Liétar, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
+            <li>Contact : <a href="https://commons.wikimedia.org/wiki/File:Cayenne_maison_cr%C3%A9ole_rue_Schoelcher_2013.jpg" rel="noopener" target="_blank">Cayenne maison créole rue Schoelcher 2013</a>, Cayambe, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
+            <li>Nous soutenir : <a href="https://commons.wikimedia.org/wiki/File:Carbet_flottant_dans_les_marais_de_Kaw.jpg" rel="noopener" target="_blank">Carbet flottant dans les marais de Kaw</a>, Don-vip, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
+            <li>Espace pro : <a href="https://commons.wikimedia.org/wiki/File:Fromager_Sa%C3%BCl.jpg" rel="noopener" target="_blank">Fromager Saül</a>, Jonathan Rochet, <a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener" target="_blank">CC BY-SA 4.0</a></li>
+        </ul>
+    </section>
+
+    <section>
         <h2>Droit applicable</h2>
         <p>Les présentes mentions légales sont régies par le droit français. En cas de litige relatif à l’utilisation du site, les juridictions françaises seront seules compétentes.</p>
     </section>
