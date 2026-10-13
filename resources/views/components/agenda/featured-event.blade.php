@@ -10,7 +10,7 @@
 <article class="agenda-featured home-reveal" style="--type-color: {{ $type['color'] }}" aria-labelledby="agenda-featured-title">
     <div class="agenda-featured-media">
         @if ($url = $item->imageUrl())
-            <img src="{{ $url }}" alt="" fetchpriority="high" decoding="async">
+            <img src="{{ $url }}" alt="" fetchpriority="high" decoding="async" style="object-position: {{ $event->flyer_position ?? 'center' }}">
         @else
             <div class="assoc-img assoc-img--placeholder"><x-home.leaf-pattern variant="palm" class="assoc-img-leaf" /></div>
         @endif

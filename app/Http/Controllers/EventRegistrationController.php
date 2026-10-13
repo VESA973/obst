@@ -16,6 +16,7 @@ class EventRegistrationController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         abort_unless($event->is_published, 404);
+        abort_if($event->is_free_entry, 422, 'Cet événement est en entrée libre, sans inscription.');
         abort_if($event->is_paid, 422, 'Les inscriptions payantes se font via le lien externe.');
 
         if ($event->registration_capacity && $event->registrations()->count() >= $event->registration_capacity) {

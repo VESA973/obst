@@ -24,7 +24,7 @@
 
     <section class="assoc-hero agenda-hero agenda-hero--event" style="--type-color: {{ $type['color'] }}" aria-labelledby="event-title">
         @if ($url = $item->imageUrl())
-            <img class="assoc-img assoc-hero-img" src="{{ $url }}" alt="" fetchpriority="high">
+            <img class="assoc-img assoc-hero-img" src="{{ $url }}" alt="" fetchpriority="high" style="object-position: {{ $event->banner_position ?? 'center' }}">
         @else
             <div class="assoc-img assoc-img--placeholder assoc-hero-img"></div>
         @endif
@@ -112,7 +112,9 @@
                 @unless ($item->isPast())
                     <section id="inscription" class="agenda-register" aria-labelledby="event-register">
                         <h2 id="event-register">Inscription</h2>
-                        @if ($event->is_paid)
+                        @if ($event->is_free_entry)
+                            <p>Entrée libre, sans inscription : venez directement !</p>
+                        @elseif ($event->is_paid)
                             @if ($event->registration_url)
                                 <p>L'inscription se fait sur la billetterie en ligne.</p>
                                 <a class="btn primary" href="{{ $event->registration_url }}" target="_blank" rel="noopener noreferrer">S'inscrire<span class="sr-only"> (nouvelle fenêtre)</span></a>
@@ -164,7 +166,7 @@
                         @foreach ($others as $other)
                             <div class="swiper-slide">
                                 <x-home.card :href="route('agenda.show', $other->event)" :title="$other->event->title" :text="$other->excerpt(120)"
-                                             :date="$other->startsAt()" :image-url="$other->imageUrl()" :badge="$other->type()['label']" :meta="$other->event->location" />
+                                             :date="$other->startsAt()" :image-url="$other->imageUrl()" :image-position="$other->event->flyer_position" :badge="$other->type()['label']" :meta="$other->event->location" />
                             </div>
                         @endforeach
                     </x-home.carousel>
@@ -193,7 +195,7 @@
                     'address' => array_filter(['@type' => 'PostalAddress', 'addressLocality' => $item->commune(), 'addressRegion' => 'Guyane', 'addressCountry' => 'FR']),
                 ]) : null,
                 'image' => $item->imageUrl() ? [$item->imageUrl()] : null,
-                'isAccessibleForFree' => ! $event->is_paid,
+                'isAccessibleForFree' => $event->is_free_entry || ! $event->is_paid,
                 'organizer' => ['@type' => 'Organization', 'name' => 'La Quinzaine Obstétricale', 'url' => route('home')],
                 'url' => route('agenda.show', $event),
             ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}

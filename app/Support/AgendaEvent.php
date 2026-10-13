@@ -151,7 +151,7 @@ class AgendaEvent
      */
     public function remainingPlaces(): ?int
     {
-        if (! $this->event->registration_capacity) {
+        if ($this->event->is_free_entry || ! $this->event->registration_capacity) {
             return null;
         }
 

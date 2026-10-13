@@ -57,7 +57,7 @@
 
     @if ($url = $item->imageUrl())
         <div class="agenda-card-media">
-            <img src="{{ $url }}" alt="" loading="lazy" decoding="async">
+            <img src="{{ $url }}" alt="" loading="lazy" decoding="async" style="object-position: {{ $event->flyer_position ?? 'center' }}">
         </div>
     @endif
 </article>

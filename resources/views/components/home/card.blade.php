@@ -12,6 +12,7 @@
     'meta' => null,
     'article' => null,
     'imageUrl' => null,
+    'imagePosition' => null,
     'date' => null,
 ])
 
@@ -20,7 +21,7 @@
         @if ($article)
             <x-news.image :article="$article" sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 85vw" />
         @elseif ($imageUrl)
-            <img src="{{ $imageUrl }}" alt="" loading="lazy" decoding="async">
+            <img src="{{ $imageUrl }}" alt="" loading="lazy" decoding="async" @if ($imagePosition) style="object-position: {{ $imagePosition }}" @endif>
         @else
             {{-- Pas d'image : pastille de date sur fond teinté, avec une fougère en filigrane. --}}
             <div class="home-card-date">

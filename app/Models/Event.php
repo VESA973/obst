@@ -21,8 +21,11 @@ class Event extends Model
         'location',
         'description',
         'image_path',
+        'banner_position',
+        'flyer_position',
         'registration_url',
         'is_paid',
+        'is_free_entry',
         'registration_capacity',
         'is_published',
     ];
@@ -33,6 +36,7 @@ class Event extends Model
             'event_date' => 'date',
             'schedule_items' => 'array',
             'is_paid' => 'boolean',
+            'is_free_entry' => 'boolean',
             'is_published' => 'boolean',
         ];
     }

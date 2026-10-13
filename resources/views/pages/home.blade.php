@@ -123,6 +123,7 @@
                     <x-home.card :href="route('agenda')" :title="$event->title" :text="\Illuminate\Support\Str::limit($event->description, 140)"
                                  :date="$event->event_date"
                                  :image-url="$event->flyer_is_image ? \Illuminate\Support\Facades\Storage::url($event->image_path) : null"
+                                 :image-position="$event->flyer_position"
                                  :badge="$event->event_date ? $event->event_date->translatedFormat('d M') : 'À venir'"
                                  :meta="$event->location" />
                 </div>

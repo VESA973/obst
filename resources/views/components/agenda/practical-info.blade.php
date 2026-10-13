@@ -38,7 +38,7 @@
         <div>
             <dt>Participation</dt>
             <dd>
-                {{ $event->is_paid ? 'Payante' : 'Gratuite' }}
+                {{ $event->is_free_entry ? 'Entrée libre' : ($event->is_paid ? 'Payante' : 'Gratuite') }}
                 @if ($remaining !== null)
                     <br><span class="agenda-info-time">{{ $remaining > 0 ? $remaining.' place'.($remaining > 1 ? 's' : '').' restante'.($remaining > 1 ? 's' : '') : 'Complet' }}</span>
                 @endif
@@ -51,7 +51,9 @@
     </dl>
 
     @unless ($item->isPast())
-        <a class="btn primary agenda-info-cta" href="#inscription">{{ $event->is_paid ? 'S\'inscrire (billetterie)' : 'S\'inscrire' }}</a>
+        @unless ($event->is_free_entry)
+            <a class="btn primary agenda-info-cta" href="#inscription">{{ $event->is_paid ? 'S\'inscrire (billetterie)' : 'S\'inscrire' }}</a>
+        @endunless
 
         @if ($item->startsAt())
             <div class="agenda-info-calendar">

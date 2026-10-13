@@ -46,6 +46,15 @@ class EventResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    /** Valeurs CSS object-position : les affiches sont surtout recadrées en hauteur. */
+    private const FRAMING_OPTIONS = [
+        '50% 0%' => 'Haut',
+        '50% 25%' => 'Haut-milieu',
+        '50% 50%' => 'Centre',
+        '50% 75%' => 'Bas-milieu',
+        '50% 100%' => 'Bas',
+    ];
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -116,21 +125,27 @@ class EventResource extends Resource
                         ]),
                     Section::make('Inscriptions')
                         ->schema([
+                            Toggle::make('is_free_entry')
+                                ->label('Événement libre')
+                                ->helperText('Entrée libre et gratuite, sans inscription.')
+                                ->live(),
                             Toggle::make('is_paid')
                                 ->label('Événement payant')
                                 ->helperText('Les inscriptions se font alors via le lien externe.')
+                                ->hidden(fn (Get $get) => (bool) $get('is_free_entry'))
                                 ->live(),
                             TextInput::make('registration_url')
                                 ->label('Lien d\'inscription externe')
                                 ->url()
                                 ->maxLength(255)
+                                ->hidden(fn (Get $get) => (bool) $get('is_free_entry'))
                                 ->required(fn (Get $get) => (bool) $get('is_paid')),
                             TextInput::make('registration_capacity')
                                 ->label('Nombre de places')
                                 ->numeric()
                                 ->minValue(1)
                                 ->maxValue(10000)
-                                ->hidden(fn (Get $get) => (bool) $get('is_paid')),
+                                ->hidden(fn (Get $get) => $get('is_paid') || $get('is_free_entry')),
                         ]),
                     Section::make('Affiche')
                         ->schema([
@@ -140,6 +155,16 @@ class EventResource extends Resource
                                 ->disk('public')
                                 ->directory('events/flyers')
                                 ->maxSize(20480),
+                            Select::make('banner_position')
+                                ->label('Cadrage de la bannière')
+                                ->helperText('Partie de l\'image visible en haut de la page de l\'événement.')
+                                ->options(self::FRAMING_OPTIONS)
+                                ->placeholder('Centre'),
+                            Select::make('flyer_position')
+                                ->label('Cadrage des vignettes')
+                                ->helperText('Partie de l\'image visible sur les cartes (accueil, agenda).')
+                                ->options(self::FRAMING_OPTIONS)
+                                ->placeholder('Centre'),
                         ]),
                 ])->columnSpan(['lg' => 1]),
             ]);
@@ -170,6 +195,7 @@ class EventResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn (int $state, Event $record) => $record->registration_capacity ? "{$state} / {$record->registration_capacity}" : (string) $state),
                 IconColumn::make('is_paid')->label('Payant')->boolean(),
+                IconColumn::make('is_free_entry')->label('Libre')->boolean(),
                 IconColumn::make('is_published')->label('Publié')->boolean(),
             ])
             ->filters([

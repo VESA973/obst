@@ -106,6 +106,20 @@ class AgendaTest extends TestCase
         $this->assertDatabaseHas('event_registrations', ['event_id' => $event->id, 'email' => 'marie@example.com']);
     }
 
+    public function test_free_entry_event_hides_registration_and_refuses_sign_ups(): void
+    {
+        $event = $this->event(['is_free_entry' => true, 'registration_capacity' => 20, 'image_path' => 'events/flyers/a.jpg', 'banner_position' => '50% 0%']);
+
+        $this->get(route('agenda.show', $event))
+            ->assertOk()
+            ->assertSee('Entrée libre')
+            ->assertSee('object-position: 50% 0%', false)
+            ->assertDontSee('Je m\'inscris', false);
+
+        $this->post(route('events.register', $event), ['name' => 'Marie', 'email' => 'marie@example.com'])->assertStatus(422);
+        $this->assertDatabaseCount('event_registrations', 0);
+    }
+
     public function test_past_event_hides_registration_and_calendar_links(): void
     {
         $event = $this->event([], '-5 days');
