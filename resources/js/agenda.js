@@ -141,6 +141,40 @@ if (calendarEl && items.length) {
     let focused = firstDay;
 
     const iso = (date) => date.toISOString().slice(0, 10);
+
+    // Infobulle du jour (survol / focus) : miniature, titre, type, horaire et lieu de chaque événement.
+    const tooltip = (events) => {
+        const tip = document.createElement('span');
+        tip.className = 'agenda-calendar-tip';
+        tip.setAttribute('aria-hidden', 'true');
+        events.forEach((item) => {
+            const row = document.createElement('span');
+            row.className = 'agenda-calendar-tip-item';
+            row.style.setProperty('--type-color', item.style.getPropertyValue('--type-color'));
+            if (item.dataset.thumb) {
+                const img = document.createElement('img');
+                img.src = item.dataset.thumb;
+                img.alt = '';
+                img.style.objectPosition = item.dataset.thumbPosition;
+                row.append(img);
+            }
+            const text = document.createElement('span');
+            [
+                ['agenda-calendar-tip-type', item.dataset.typeLabel],
+                ['agenda-calendar-tip-title', item.querySelector('.home-card-link').textContent],
+                ['', item.dataset.time],
+                ['', item.dataset.place],
+            ].filter(([, value]) => value).forEach(([className, value]) => {
+                const line = document.createElement('span');
+                line.className = className;
+                line.textContent = value;
+                text.append(line);
+            });
+            row.append(text);
+            tip.append(row);
+        });
+        return tip;
+    };
     const visibleEvents = (day) => (eventsByDay.get(day) ?? []).filter(matches);
 
     const showDay = (day) => {
@@ -214,6 +248,20 @@ if (calendarEl && items.length) {
                     });
                     button.append(dots);
                     button.classList.add('has-events');
+
+                    // Miniature de la première affiche du jour en fond de case.
+                    const withThumb = events.find((item) => item.dataset.thumb);
+                    if (withThumb) {
+                        const img = document.createElement('img');
+                        img.className = 'agenda-calendar-thumb';
+                        img.src = withThumb.dataset.thumb;
+                        img.alt = '';
+                        img.loading = 'lazy';
+                        img.style.objectPosition = withThumb.dataset.thumbPosition;
+                        button.prepend(img);
+                        button.classList.add('has-thumb');
+                    }
+                    button.append(tooltip(events));
                 }
                 cell.append(button);
                 row.append(cell);

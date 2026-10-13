@@ -20,7 +20,12 @@
     data-commune="{{ $item->commune() }}"
     data-month="{{ $start?->format('Y-m') }}"
     data-days="{{ $item->slots()->map(fn ($slot) => $slot['date']->format('Y-m-d'))->implode(',') }}"
-    data-search="{{ $search }}">
+    data-search="{{ $search }}"
+    data-thumb="{{ $item->imageUrl() }}"
+    data-thumb-position="{{ $event->flyer_position ?? 'center' }}"
+    data-time="{{ $item->timeRange() }}"
+    data-place="{{ $event->location }}"
+    data-type-label="{{ $type['label'] }}">
     <x-agenda.date-block :date="$start" :muted="$past" />
 
     <div class="agenda-card-body">

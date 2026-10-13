@@ -751,6 +751,122 @@
     box-shadow: 0 0 0 1.5px var(--white);
 }
 
+/* Case avec affiche : miniature en fond, numéro du jour en pastille. */
+.agenda-calendar-thumb {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
+.agenda-calendar-cell.has-thumb > span:first-of-type {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    min-width: 24px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    color: var(--ink);
+    background: rgb(255 255 255 / 0.9);
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.agenda-calendar-cell.has-thumb[tabindex='0'] {
+    box-shadow: 0 0 0 3px var(--deep-teal);
+}
+
+.agenda-calendar-cell.has-thumb[tabindex='0'] > span:first-of-type {
+    color: var(--white);
+    background: var(--deep-teal);
+}
+
+/* Infobulle au survol / focus : au-dessus de la case, alignée sur les bords pour les colonnes extrêmes. */
+.agenda-calendar-tip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    z-index: 5;
+    display: grid;
+    gap: 10px;
+    width: min(260px, 80vw);
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    color: var(--ink);
+    background: var(--white);
+    box-shadow: var(--home-shadow-md);
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.35;
+    text-align: left;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 6px);
+    transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+    pointer-events: none;
+}
+
+.agenda-calendar-grid td:nth-child(-n + 2) .agenda-calendar-tip {
+    left: 0;
+    transform: translate(0, 6px);
+}
+
+.agenda-calendar-grid td:nth-child(n + 6) .agenda-calendar-tip {
+    right: 0;
+    left: auto;
+    transform: translate(0, 6px);
+}
+
+.agenda-calendar-cell:hover .agenda-calendar-tip,
+.agenda-calendar-cell:focus-visible .agenda-calendar-tip {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.agenda-calendar-grid td:nth-child(-n + 2) .agenda-calendar-cell:is(:hover, :focus-visible) .agenda-calendar-tip,
+.agenda-calendar-grid td:nth-child(n + 6) .agenda-calendar-cell:is(:hover, :focus-visible) .agenda-calendar-tip {
+    transform: none;
+}
+
+.agenda-calendar-tip-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+    padding-left: 10px;
+    border-left: 4px solid var(--type-color, var(--teal));
+}
+
+.agenda-calendar-tip-item img {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.agenda-calendar-tip-item > span {
+    display: grid;
+    gap: 2px;
+    grid-column: -2;
+    color: var(--muted);
+}
+
+.agenda-calendar-tip-type {
+    color: var(--type-color, var(--teal));
+    font-size: 0.72rem;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.agenda-calendar-tip-title {
+    color: var(--ink);
+    font-weight: 800;
+}
+
 .agenda-calendar-day {
     margin-top: 16px;
     padding-top: 16px;
