@@ -87,7 +87,7 @@ class EventResource extends Resource
                                 ->numeric()
                                 ->minValue(-90)
                                 ->maxValue(90)
-                                ->helperText('Remplie par le bouton 📍 du lieu, ou à la main. Vide : position de la commune.'),
+                                ->helperText('Remplie par le bouton 📍 du lieu, ou à la main (clic droit sur Google Maps pour copier les coordonnées). Vide : position de la commune.'),
                             TextInput::make('longitude')->label('Longitude')->numeric()->minValue(-180)->maxValue(180),
                             Textarea::make('description')->label('Description')->maxLength(2000)->rows(4)->columnSpanFull(),
                         ]),
@@ -199,22 +199,39 @@ class EventResource extends Resource
         try {
             $result = Http::withHeaders(['User-Agent' => config('app.name').' ('.config('app.url').')'])
                 ->timeout(8)
-                ->get('https://nominatim.openstreetmap.org/search', ['q' => $location, 'format' => 'json', 'limit' => 1, 'countrycodes' => 'gf,fr'])
+                ->get('https://nominatim.openstreetmap.org/search', ['q' => $location, 'format' => 'jsonv2', 'limit' => 5, 'countrycodes' => 'gf,fr'])
                 ->throw()
-                ->json(0);
+                ->json();
+            // Rang 20+ : quartier, rue, adresse ou lieu nommé. En dessous (commune, région), le point tombe au centre de la zone.
+            $result = collect($result)->first(fn (array $place) => ($place['place_rank'] ?? 0) >= 20);
         } catch (\Throwable) {
             $result = null;
         }
 
         if (! $result) {
-            Notification::make()->title('Lieu introuvable')->body('Précisez l\'adresse ou saisissez les coordonnées à la main.')->warning()->send();
+            Notification::make()
+                ->title('Lieu précis introuvable')
+                ->body('Saisissez une adresse (ex. « 4179 route de Montabo, Cayenne ») ou les coordonnées à la main. Sans coordonnées, la carte montre la commune.')
+                ->warning()
+                ->persistent()
+                ->send();
 
             return;
         }
 
-        $set('latitude', round((float) $result['lat'], 6));
-        $set('longitude', round((float) $result['lon'], 6));
-        Notification::make()->title('Position trouvée')->body($result['display_name'] ?? '')->success()->send();
+        $lat = round((float) $result['lat'], 6);
+        $lng = round((float) $result['lon'], 6);
+        $set('latitude', $lat);
+        $set('longitude', $lng);
+        Notification::make()
+            ->title('Position trouvée : vérifiez-la avant d\'enregistrer')
+            ->body($result['display_name'] ?? '')
+            ->success()
+            ->persistent()
+            ->actions([
+                Action::make('check')->label('Voir sur la carte')->url("https://www.openstreetmap.org/?mlat={$lat}&mlon={$lng}#map=17/{$lat}/{$lng}", shouldOpenInNewTab: true),
+            ])
+            ->send();
     }
 
     public static function table(Table $table): Table
