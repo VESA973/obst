@@ -22,6 +22,15 @@ class EventAsset extends Model
         'title',
     ];
 
+    protected static function booted(): void
+    {
+        // Le type se déduit du fichier : les images vont dans la galerie, le reste en documents.
+        static::saving(function (EventAsset $asset): void {
+            $extension = strtolower(pathinfo($asset->path ?? '', PATHINFO_EXTENSION));
+            $asset->type = in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true) ? 'photo' : 'document';
+        });
+    }
+
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);

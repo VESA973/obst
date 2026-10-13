@@ -89,7 +89,7 @@
                             @foreach ($photos as $photo)
                                 <li class="assoc-gallery-item">
                                     <a class="assoc-gallery-link glightbox" data-gallery="event" href="{{ Storage::url($photo->path) }}">
-                                        <img src="{{ Storage::url($photo->path) }}" alt="Photo {{ $loop->iteration }} — {{ $event->title }}" loading="lazy">
+                                        <img src="{{ Storage::url($photo->path) }}" alt="{{ $photo->title ?: 'Photo '.$loop->iteration }} — {{ $event->title }}" loading="lazy">
                                     </a>
                                 </li>
                             @endforeach
@@ -143,14 +143,21 @@
                     </section>
                 @endunless
 
-                {{-- Carte : position approximative de la commune (aucune adresse précise n'est enregistrée). --}}
+                {{-- Carte : position exacte saisie dans l'admin, sinon position approximative de la commune. --}}
                 @if ($coordinates)
                     <section aria-labelledby="event-map">
                         <h2 id="event-map">Localisation</h2>
-                        <div class="agenda-map" data-agenda-map data-lat="{{ $coordinates[0] }}" data-lng="{{ $coordinates[1] }}" data-label="{{ $item->commune() }}">
-                            <p class="agenda-map-fallback">Carte de {{ $item->commune() }} (chargement…)</p>
+                        <div class="agenda-map" data-agenda-map data-lat="{{ $coordinates[0] }}" data-lng="{{ $coordinates[1] }}" data-label="{{ $item->hasExactLocation() ? $event->location : $item->commune() }}" @if ($item->hasExactLocation()) data-exact @endif>
+                            <p class="agenda-map-fallback">Carte (chargement…)</p>
                         </div>
-                        <p class="agenda-map-note">Position approximative de la commune de {{ $item->commune() }}. Carte © contributeurs OpenStreetMap.</p>
+                        <p class="agenda-map-note">
+                            @if ($item->hasExactLocation())
+                                {{ $event->location }}. <a href="https://www.openstreetmap.org/directions?to={{ $coordinates[0] }}%2C{{ $coordinates[1] }}" target="_blank" rel="noopener noreferrer">Itinéraire<span class="sr-only"> (nouvelle fenêtre)</span></a>
+                            @else
+                                Position approximative de la commune de {{ $item->commune() }}.
+                            @endif
+                            Carte © contributeurs OpenStreetMap.
+                        </p>
                     </section>
                 @endif
             </div>

@@ -7,6 +7,7 @@ use App\Filament\Resources\Events\Pages\EditEvent;
 use App\Filament\Resources\Events\Pages\ListEvents;
 use App\Filament\Resources\Events\RelationManagers\RegistrationsRelationManager;
 use App\Models\Event;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,16 +19,19 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Http;
 use UnitEnum;
 
 class EventResource extends Resource
@@ -69,7 +73,22 @@ class EventResource extends Resource
                                 ->label('Date principale')
                                 ->helperText('Laissez vide pour reprendre la première date du programme.')
                                 ->native(false),
-                            TextInput::make('location')->label('Lieu')->maxLength(255),
+                            TextInput::make('location')
+                                ->label('Lieu')
+                                ->maxLength(255)
+                                ->suffixAction(
+                                    Action::make('geocode')
+                                        ->icon('heroicon-o-map-pin')
+                                        ->tooltip('Trouver la position sur la carte')
+                                        ->action(fn (Get $get, Set $set) => self::geocode($get('location'), $set)),
+                                ),
+                            TextInput::make('latitude')
+                                ->label('Latitude')
+                                ->numeric()
+                                ->minValue(-90)
+                                ->maxValue(90)
+                                ->helperText('Remplie par le bouton 📍 du lieu, ou à la main. Vide : position de la commune.'),
+                            TextInput::make('longitude')->label('Longitude')->numeric()->minValue(-180)->maxValue(180),
                             Textarea::make('description')->label('Description')->maxLength(2000)->rows(4)->columnSpanFull(),
                         ]),
                     Section::make('Programme')
@@ -96,22 +115,18 @@ class EventResource extends Resource
                                 ->relationship()
                                 ->addActionLabel('Ajouter un fichier')
                                 ->defaultItems(0)
-                                ->columns(3)
+                                ->columns(2)
                                 ->schema([
-                                    Select::make('type')
-                                        ->label('Type')
-                                        ->options(['photo' => 'Photo', 'document' => 'Document'])
-                                        ->default('photo')
-                                        ->required()
-                                        ->live(),
                                     TextInput::make('title')
-                                        ->label('Titre du document')
-                                        ->maxLength(255)
-                                        ->visible(fn (Get $get) => $get('type') === 'document'),
+                                        ->label('Nom (facultatif)')
+                                        ->helperText('Choisissez dans la liste, saisissez un autre nom ou laissez vide.')
+                                        ->datalist(['Brochure', 'Programme', 'Dépliant', 'Affiche', 'Flyer', 'Présentation', 'Compte rendu', 'Bulletin d\'inscription'])
+                                        ->maxLength(255),
                                     FileUpload::make('path')
                                         ->label('Fichier')
+                                        ->helperText('Les images s\'affichent dans la galerie, les autres fichiers en documents.')
                                         ->disk('public')
-                                        ->directory(fn (Get $get) => $get('type') === 'document' ? 'events/documents' : 'events/photos')
+                                        ->directory('events/files')
                                         ->storeFileNamesIn('original_name')
                                         ->maxSize(20480)
                                         ->required(),
@@ -168,6 +183,38 @@ class EventResource extends Resource
                         ]),
                 ])->columnSpan(['lg' => 1]),
             ]);
+    }
+
+    /**
+     * Cherche les coordonnées du lieu via Nominatim (OpenStreetMap), en privilégiant la Guyane.
+     */
+    private static function geocode(?string $location, Set $set): void
+    {
+        if (blank($location)) {
+            Notification::make()->title('Saisissez d\'abord un lieu.')->warning()->send();
+
+            return;
+        }
+
+        try {
+            $result = Http::withHeaders(['User-Agent' => config('app.name').' ('.config('app.url').')'])
+                ->timeout(8)
+                ->get('https://nominatim.openstreetmap.org/search', ['q' => $location, 'format' => 'json', 'limit' => 1, 'countrycodes' => 'gf,fr'])
+                ->throw()
+                ->json(0);
+        } catch (\Throwable) {
+            $result = null;
+        }
+
+        if (! $result) {
+            Notification::make()->title('Lieu introuvable')->body('Précisez l\'adresse ou saisissez les coordonnées à la main.')->warning()->send();
+
+            return;
+        }
+
+        $set('latitude', round((float) $result['lat'], 6));
+        $set('longitude', round((float) $result['lon'], 6));
+        Notification::make()->title('Position trouvée')->body($result['display_name'] ?? '')->success()->send();
     }
 
     public static function table(Table $table): Table

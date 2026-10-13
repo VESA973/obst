@@ -120,6 +120,32 @@ class AgendaTest extends TestCase
         $this->assertDatabaseCount('event_registrations', 0);
     }
 
+    public function test_agenda_map_lists_located_events_with_exact_position_first(): void
+    {
+        $exact = $this->event(['title' => 'Stand précis', 'latitude' => 4.9, 'longitude' => -52.3, 'image_path' => 'events/flyers/a.jpg']);
+        $this->event(['title' => 'Sans lieu', 'location' => null]);
+
+        $this->get(route('agenda'))
+            ->assertOk()
+            ->assertSee('Où nous retrouver')
+            ->assertSee('"lat":4.9', false)
+            ->assertSee('"title":"Stand pr\\u00e9cis"', false)
+            ->assertDontSee('"title":"Sans lieu"', false);
+
+        $this->get(route('agenda.show', $exact))->assertSee('data-exact', false)->assertSee('Itinéraire');
+    }
+
+    public function test_asset_type_is_deduced_from_the_file(): void
+    {
+        $event = $this->event();
+
+        $photo = $event->assets()->create(['path' => 'events/files/a.JPG', 'title' => 'Affiche']);
+        $brochure = $event->assets()->create(['path' => 'events/files/b.pdf', 'title' => 'Brochure']);
+
+        $this->assertSame('photo', $photo->type);
+        $this->assertSame('document', $brochure->type);
+    }
+
     public function test_past_event_hides_registration_and_calendar_links(): void
     {
         $event = $this->event([], '-5 days');

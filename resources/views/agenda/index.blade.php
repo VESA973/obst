@@ -18,6 +18,18 @@
     $communes = $upcoming->map->commune()->filter()->unique()->sort()->mapWithKeys(fn ($commune) => [$commune => ['label' => $commune]])->all();
     $months = $upcoming->map->startsAt()->filter()->mapWithKeys(fn ($date) => [$date->format('Y-m') => ['label' => ucfirst($date->translatedFormat('F Y'))]])->all();
 
+    // Points de la carte : événements à venir localisés (position exacte ou commune).
+    $mapPoints = $upcoming->filter->coordinates()->map(fn ($item) => [
+        'lat' => $item->coordinates()[0],
+        'lng' => $item->coordinates()[1],
+        'title' => $item->event->title,
+        'url' => route('agenda.show', $item->event),
+        'date' => $item->startsAt() ? ucfirst($item->startsAt()->translatedFormat('l j F')) : null,
+        'place' => $item->event->location,
+        'thumb' => $item->imageUrl(),
+        'position' => $item->event->flyer_position ?? 'center',
+    ])->values();
+
     $byMonth = $upcoming->groupBy(fn ($item) => $item->startsAt()?->format('Y-m') ?? 'a-venir');
 @endphp
 
@@ -94,6 +106,16 @@
                     </div>
                 @endif
             </section>
+
+            @if ($mapPoints->isNotEmpty())
+                <section class="agenda-upcoming" aria-labelledby="agenda-map-title">
+                    <x-home.section-title eyebrow="Carte" title="Où nous retrouver" id="agenda-map-title" />
+                    <div class="agenda-map agenda-map--events" data-agenda-map data-points='@json($mapPoints)'>
+                        <p class="agenda-map-fallback">Carte des événements (chargement…)</p>
+                    </div>
+                    <p class="agenda-map-note">Touchez une affiche pour voir l'événement. Carte © contributeurs OpenStreetMap.</p>
+                </section>
+            @endif
 
             {{-- Événements passés : repliés, style atténué. --}}
             @if ($past->isNotEmpty())

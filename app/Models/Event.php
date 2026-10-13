@@ -19,6 +19,8 @@ class Event extends Model
         'event_date',
         'schedule_items',
         'location',
+        'latitude',
+        'longitude',
         'description',
         'image_path',
         'banner_position',
@@ -37,6 +39,8 @@ class Event extends Model
             'schedule_items' => 'array',
             'is_paid' => 'boolean',
             'is_free_entry' => 'boolean',
+            'latitude' => 'float',
+            'longitude' => 'float',
             'is_published' => 'boolean',
         ];
     }

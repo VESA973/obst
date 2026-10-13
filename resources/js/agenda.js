@@ -307,19 +307,43 @@ document.querySelectorAll('[data-copy-link]').forEach((button) => {
 
 const mapEl = document.querySelector('[data-agenda-map]');
 if (mapEl) {
+    const escapeHtml = (text) => String(text ?? '').replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
+
     const loadMap = async () => {
         const [{ default: L }] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
         mapEl.innerHTML = '';
-        const position = [Number(mapEl.dataset.lat), Number(mapEl.dataset.lng)];
-        const map = L.map(mapEl, { scrollWheelZoom: false, zoomAnimation: !reducedMotion }).setView(position, 11);
+        const map = L.map(mapEl, { scrollWheelZoom: false, zoomAnimation: !reducedMotion });
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
             attribution: '&copy; contributeurs <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(map);
-        // Cercle plutôt que marqueur : la position est celle de la commune, pas une adresse.
-        L.circle(position, { radius: 1500, color: '#3a00f5', fillColor: '#c62bc8', fillOpacity: 0.25 })
-            .addTo(map)
-            .bindTooltip(mapEl.dataset.label, { permanent: true, direction: 'top' });
+
+        // Carte de l'agenda : un marqueur par événement, avec la miniature de l'affiche.
+        if (mapEl.dataset.points) {
+            const points = JSON.parse(mapEl.dataset.points);
+            const markers = points.map((point) => {
+                const thumb = point.thumb
+                    ? `<img src="${escapeHtml(point.thumb)}" alt="" style="object-position: ${escapeHtml(point.position)}">`
+                    : '';
+                const icon = L.divIcon({ className: 'agenda-map-pin', html: thumb, iconSize: [52, 52], iconAnchor: [26, 52], popupAnchor: [0, -50] });
+                return L.marker([point.lat, point.lng], { icon, title: point.title, alt: point.title })
+                    .bindPopup(`<div class="agenda-map-popup">${thumb}<strong>${escapeHtml(point.title)}</strong>`
+                        + (point.date ? `<span>${escapeHtml(point.date)}</span>` : '')
+                        + (point.place ? `<span>${escapeHtml(point.place)}</span>` : '')
+                        + `<a href="${escapeHtml(point.url)}">Voir l'événement</a></div>`)
+                    .addTo(map);
+            });
+            map.fitBounds(L.featureGroup(markers).getBounds().pad(0.3), { maxZoom: 13 });
+            return;
+        }
+
+        const position = [Number(mapEl.dataset.lat), Number(mapEl.dataset.lng)];
+        map.setView(position, mapEl.hasAttribute('data-exact') ? 15 : 11);
+        // Adresse précise : marqueur ; sinon cercle, la position n'étant que celle de la commune.
+        const shape = mapEl.hasAttribute('data-exact')
+            ? L.marker(position, { icon: L.divIcon({ className: 'agenda-map-pin agenda-map-pin--dot', iconSize: [22, 22], iconAnchor: [11, 22] }) })
+            : L.circle(position, { radius: 1500, color: '#3a00f5', fillColor: '#c62bc8', fillOpacity: 0.25 });
+        shape.addTo(map).bindTooltip(mapEl.dataset.label, { permanent: true, direction: 'top' });
     };
 
     if ('IntersectionObserver' in window) {

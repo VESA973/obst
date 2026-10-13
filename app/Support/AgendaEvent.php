@@ -53,11 +53,20 @@ class AgendaEvent
     }
 
     /**
-     * @return array{0: float, 1: float}|null Position approximative de la commune.
+     * @return array{0: float, 1: float}|null Position exacte saisie dans l'admin, sinon celle de la commune.
      */
     public function coordinates(): ?array
     {
+        if ($this->hasExactLocation()) {
+            return [$this->event->latitude, $this->event->longitude];
+        }
+
         return ($commune = $this->commune()) ? config("agenda.communes.{$commune}") : null;
+    }
+
+    public function hasExactLocation(): bool
+    {
+        return $this->event->latitude !== null && $this->event->longitude !== null;
     }
 
     /**

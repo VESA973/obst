@@ -1011,6 +1011,50 @@
     background: var(--sage);
 }
 
+.agenda-map--events {
+    height: clamp(320px, 50vw, 460px);
+}
+
+/* Marqueur de la carte : miniature de l'affiche en goutte, ou pastille. */
+.agenda-map-pin {
+    display: grid;
+    overflow: hidden;
+    border: 3px solid var(--white);
+    border-radius: 50% 50% 50% 0;
+    background: var(--teal);
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.25);
+    transform: rotate(-45deg);
+}
+
+.agenda-map-pin img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: rotate(45deg) scale(1.42);
+}
+
+.agenda-map-pin--dot {
+    background: var(--coral);
+}
+
+.agenda-map-popup {
+    display: grid;
+    gap: 4px;
+    width: 180px;
+}
+
+.agenda-map-popup img {
+    width: 100%;
+    height: 110px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.agenda-map-popup span {
+    color: var(--muted);
+}
+
 .agenda-map-fallback {
     display: grid;
     place-items: center;
