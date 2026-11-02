@@ -7,6 +7,7 @@ use App\Support\AgendaEvent;
 use Database\Seeders\AgendaExampleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
@@ -144,6 +145,27 @@ class AgendaTest extends TestCase
 
         $this->assertSame('photo', $photo->type);
         $this->assertSame('document', $brochure->type);
+    }
+
+    public function test_pdf_document_shows_a_first_page_preview_removed_with_the_file(): void
+    {
+        Storage::fake('public');
+        $pdf = new \Imagick;
+        $pdf->newImage(200, 280, 'white');
+        $pdf->setImageFormat('pdf');
+        Storage::disk('public')->put('events/files/b.pdf', $pdf->getImageBlob());
+
+        $event = $this->event();
+        $brochure = $event->assets()->create(['path' => 'events/files/b.pdf', 'title' => 'Brochure']);
+
+        $this->get(route('agenda.show', $event))
+            ->assertOk()
+            ->assertSee('Brochure')
+            ->assertSee('thumbs/400/events/files/b.webp', false);
+        Storage::disk('public')->assertExists('thumbs/400/events/files/b.webp');
+
+        $brochure->delete();
+        Storage::disk('public')->assertMissing('thumbs/400/events/files/b.webp');
     }
 
     public function test_past_event_hides_registration_and_calendar_links(): void

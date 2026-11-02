@@ -1038,6 +1038,41 @@
     font-weight: 700;
 }
 
+/* Cartes avec aperçu de la première page des PDF. */
+.agenda-documents--previews {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 220px));
+    gap: 20px;
+    padding-left: 0;
+    list-style: none;
+}
+
+.agenda-documents--previews a {
+    display: grid;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.agenda-documents--previews img {
+    width: 100%;
+    aspect-ratio: 1 / 1.414;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: var(--home-shadow-sm);
+    transition: transform 300ms ease;
+}
+
+.agenda-documents--previews a:hover img {
+    transform: translateY(-3px);
+}
+
+.agenda-documents--previews a:hover span,
+.agenda-documents--previews a:focus-visible span {
+    text-decoration: underline;
+}
+
 .agenda-register {
     padding: clamp(20px, 3vw, 32px);
     border: 1px solid var(--line);

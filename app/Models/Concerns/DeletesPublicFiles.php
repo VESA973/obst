@@ -2,11 +2,12 @@
 
 namespace App\Models\Concerns;
 
+use App\Support\ResponsiveImage;
 use Illuminate\Support\Facades\Storage;
 
 /**
  * Supprime du disque « public » les fichiers remplacés ou dont l'enregistrement est supprimé.
- * Le modèle déclare ses colonnes de fichiers dans la propriété $publicFiles.
+ * Le modèle déclare ses colonnes de fichiers dans la propriété $publicFiles. Leurs miniatures partent avec.
  */
 trait DeletesPublicFiles
 {
@@ -18,6 +19,7 @@ trait DeletesPublicFiles
 
                 if ($model->wasChanged($attribute) && self::isStoredFile($original)) {
                     Storage::disk('public')->delete($original);
+                    ResponsiveImage::forget($original);
                 }
             }
         });
@@ -26,6 +28,7 @@ trait DeletesPublicFiles
             foreach ($model->publicFiles as $attribute) {
                 if (self::isStoredFile($model->getAttribute($attribute))) {
                     Storage::disk('public')->delete($model->getAttribute($attribute));
+                    ResponsiveImage::forget($model->getAttribute($attribute));
                 }
             }
         });

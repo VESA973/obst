@@ -11,6 +11,7 @@ use Throwable;
 /**
  * Miniatures WebP (400, 800 et 1200 px de large) générées à la première demande
  * dans storage/app/public/thumbs, pour alimenter les attributs srcset.
+ * Pour un PDF, la miniature montre la première page (Imagick + Ghostscript).
  */
 class ResponsiveImage
 {
@@ -37,8 +38,8 @@ class ResponsiveImage
             $thumbnail = self::thumbnailPath($path, $width);
 
             if (! $disk->exists($thumbnail) && ! self::generate($path, $thumbnail, $width)) {
-                // Conversion impossible (format non géré…) : on sert l'original.
-                return ['src' => $disk->url($path), 'srcset' => ''];
+                // Conversion impossible (format non géré…) : on sert l'original, sauf un PDF qui n'a alors pas d'aperçu.
+                return self::isPdf($path) ? null : ['src' => $disk->url($path), 'srcset' => ''];
             }
 
             $sources[$width] = $disk->url($thumbnail);
@@ -74,7 +75,7 @@ class ResponsiveImage
         $disk = Storage::disk('public');
 
         try {
-            $image = (new ImageManager(new Driver))->read($disk->path($path));
+            $image = (new ImageManager(new Driver))->read(self::isPdf($path) ? self::pdfFirstPage($disk->path($path)) : $disk->path($path));
 
             // Jamais d'agrandissement : une petite image garde sa taille.
             $encoded = $image->scaleDown(width: $width)->toWebp(quality: 78);
@@ -87,5 +88,26 @@ class ResponsiveImage
 
             return false;
         }
+    }
+
+    public static function isPdf(?string $path): bool
+    {
+        return strtolower(pathinfo($path ?? '', PATHINFO_EXTENSION)) === 'pdf';
+    }
+
+    /**
+     * Première page du PDF en PNG (150 dpi, assez net pour la miniature de 1200 px).
+     */
+    private static function pdfFirstPage(string $file): string
+    {
+        $page = new \Imagick;
+        $page->setResolution(150, 150);
+        $page->readImage($file.'[0]');
+        // Fond blanc : sans lui, les pages transparentes ressortent en noir.
+        $page->setImageBackgroundColor('white');
+        $page = $page->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
+        $page->setImageFormat('png');
+
+        return $page->getImageBlob();
     }
 }

@@ -79,7 +79,19 @@
                 @endif
 
                 @if ($event->image_path && ! $event->flyer_is_image)
-                    <p><a class="home-link-arrow" href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noopener">Ouvrir le flyer ({{ $event->flyer_extension }})</a></p>
+                    @php($flyerPreview = \App\Support\ResponsiveImage::for($event->image_path))
+                    @if ($flyerPreview)
+                        <ul class="agenda-documents agenda-documents--previews">
+                            <li>
+                                <a href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noopener">
+                                    <img src="{{ $flyerPreview['src'] }}" srcset="{{ $flyerPreview['srcset'] }}" sizes="220px" alt="" loading="lazy">
+                                    <span>Ouvrir le flyer ({{ $event->flyer_extension }})</span>
+                                </a>
+                            </li>
+                        </ul>
+                    @else
+                        <p><a class="home-link-arrow" href="{{ Storage::url($event->image_path) }}" target="_blank" rel="noopener">Ouvrir le flyer ({{ $event->flyer_extension }})</a></p>
+                    @endif
                 @endif
 
                 @if ($photos->isNotEmpty())
@@ -100,9 +112,18 @@
                 @if ($documents->isNotEmpty())
                     <section aria-labelledby="event-documents">
                         <h2 id="event-documents">Documents</h2>
-                        <ul class="agenda-documents">
+                        <ul class="agenda-documents agenda-documents--previews">
                             @foreach ($documents as $document)
-                                <li><a href="{{ Storage::url($document->path) }}" target="_blank" rel="noopener">{{ $document->title ?: $document->original_name ?: 'Document associé' }}</a></li>
+                                {{-- Aperçu de la première page pour les PDF ; les autres fichiers restent un simple lien. --}}
+                                @php($preview = \App\Support\ResponsiveImage::isPdf($document->path) ? \App\Support\ResponsiveImage::for($document->path) : null)
+                                <li>
+                                    <a href="{{ Storage::url($document->path) }}" target="_blank" rel="noopener">
+                                        @if ($preview)
+                                            <img src="{{ $preview['src'] }}" srcset="{{ $preview['srcset'] }}" sizes="220px" alt="" loading="lazy">
+                                        @endif
+                                        <span>{{ $document->title ?: $document->original_name ?: 'Document associé' }}</span>
+                                    </a>
+                                </li>
                             @endforeach
                         </ul>
                     </section>
